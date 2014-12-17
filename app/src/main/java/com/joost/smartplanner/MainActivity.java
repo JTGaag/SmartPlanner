@@ -69,6 +69,7 @@ public class MainActivity extends ActionBarActivity implements WeekView.MonthCha
 
     }
 
+    //comment
     @Override
     public List<WeekViewEvent> onMonthChange(int newYear, int newMonth) {
         // Populate the week view with some events.
