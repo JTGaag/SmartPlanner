@@ -451,8 +451,9 @@ public class WeekView extends View {
              * TODO: Set Line on right time
              */
             if (sameDay){
+                Calendar rightNow = Calendar.getInstance();
                 float currentTimeLine[] = new float[4];
-                float currentHour = 7.25f;
+                float currentHour = (float) rightNow.HOUR_OF_DAY + (rightNow.MINUTE/60.0f);//7.25f;
                 float top = mHeaderTextHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * currentHour + mTimeTextHeight/2 + mHeaderMarginBottom;
                 currentTimeLine[0] = start;
                 currentTimeLine[1] = currentTimeLine[3] = top;
