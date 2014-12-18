@@ -25,6 +25,8 @@ import android.view.View;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
+import com.joost.smartplanner.R;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -55,6 +57,7 @@ public class WeekView extends View {
     private float mWidthPerDay;
     private Paint mDayBackgroundPaint;
     private Paint mHourSeparatorPaint;
+    private Paint mCurrentTimeLinePaint;
     private float mHeaderMarginBottom;
     private Paint mTodayBackgroundPaint;
     private Paint mTodayHeaderTextPaint;
@@ -82,8 +85,10 @@ public class WeekView extends View {
     private int mHeaderRowBackgroundColor = Color.WHITE;
     private int mDayBackgroundColor = Color.rgb(245, 245, 245);
     private int mHourSeparatorColor = Color.rgb(230, 230, 230);
+    private int mCurrentTimeLineColor = Color.rgb(230, 0, 0);
     private int mTodayBackgroundColor = Color.rgb(239, 247, 254);
     private int mHourSeparatorHeight = 2;
+    private int mCurrentTimeLineHeight = 2;
     private int mTodayHeaderTextColor = Color.rgb(39, 137, 228);
     private int mEventTextSize = 12;
     private int mEventTextColor = Color.BLACK;
@@ -198,6 +203,10 @@ public class WeekView extends View {
         // Hold references.
         mContext = context;
 
+        /**
+         * TODO: add currentTimeLine color and Height to attributes
+         */
+
         // Get the attribute values (if any).
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0);
         try {
@@ -275,6 +284,16 @@ public class WeekView extends View {
         mHourSeparatorPaint.setStrokeWidth(mHourSeparatorHeight);
         mHourSeparatorPaint.setColor(mHourSeparatorColor);
 
+        /**
+         * Added by Joost
+         * Prepare current time color paint
+         */
+        mCurrentTimeLinePaint = new Paint();
+        mCurrentTimeLinePaint.setStyle(Paint.Style.STROKE);
+        mCurrentTimeLinePaint.setStrokeWidth(mCurrentTimeLineHeight);
+        mCurrentTimeLinePaint.setColor(mCurrentTimeLineColor);
+
+
         // Prepare today background color paint.
         mTodayBackgroundPaint = new Paint();
         mTodayBackgroundPaint.setColor(mTodayBackgroundColor);
@@ -303,6 +322,10 @@ public class WeekView extends View {
 
         // Set default event color.
         mDefaultEventColor = Color.parseColor("#9fc6e7");
+
+        /**
+         * TODO: Get current time and verticaly scroll to the time
+         */
     }
 
     @Override
@@ -421,6 +444,21 @@ public class WeekView extends View {
 
             // Draw the lines for hours.
             canvas.drawLines(hourLines, mHourSeparatorPaint);
+
+            /**
+             * Edit by Joost
+             * Draw hour line
+             * TODO: Set Line on right time
+             */
+            if (sameDay){
+                float currentTimeLine[] = new float[4];
+                float currentHour = 7.25f;
+                float top = mHeaderTextHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * currentHour + mTimeTextHeight/2 + mHeaderMarginBottom;
+                currentTimeLine[0] = start;
+                currentTimeLine[1] = currentTimeLine[3] = top;
+                currentTimeLine[2] = startPixel + mWidthPerDay;
+                canvas.drawLines(currentTimeLine, mCurrentTimeLinePaint);
+            }
 
             // Draw the events.
             drawEvents(day, startPixel, canvas);
