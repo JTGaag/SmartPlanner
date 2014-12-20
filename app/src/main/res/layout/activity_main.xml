@@ -28,7 +28,7 @@
         app:headerColumnBackground="#ffffffff"
         app:hourSeparatorColor="#22000000"
         app:hourSeparatorHeight="2dp"
-        app:currentHourLineColor="#ff00aa00"
-        app:currentHourLineHeight="8dp"/>
+        app:currentHourLineColor="#ffaa0000"
+        app:currentHourLineHeight="2dp"/>
 
 </RelativeLayout>

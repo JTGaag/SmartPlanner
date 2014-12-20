@@ -326,8 +326,11 @@ public class WeekView extends View {
         mDefaultEventColor = Color.parseColor("#9fc6e7");
 
         /**
-         * TODO: Get current time and verticaly scroll to the time
+         * Done: Get current time and verticaly scroll to the time (20141220)
          */
+        Calendar rightNow = Calendar.getInstance();
+        float currentHour = (float) rightNow.get(Calendar.HOUR_OF_DAY) + (rightNow.get(Calendar.MINUTE)/60.00f);
+        mCurrentOrigin.y = -(mHourHeight)*(currentHour-1);
     }
 
     @Override
@@ -450,7 +453,7 @@ public class WeekView extends View {
             /**
              * Edit by Joost
              * Draw hour line
-             * TODO: Set Line on right time
+             * Done: Set Line on right time (20141219)
              */
             if (sameDay){
                 Calendar rightNow = Calendar.getInstance();
