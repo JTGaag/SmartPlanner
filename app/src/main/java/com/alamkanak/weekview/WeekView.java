@@ -1165,6 +1165,38 @@ public class WeekView extends View {
         return mLastVisibleDay;
     }
 
+    /**
+     * Returns the current time line color
+     * @return The current time line color
+     */
+    public int getCurrentTimeLineColor() {
+        return mCurrentTimeLineColor;
+    }
+
+    /**
+     * Set the current time line color
+     * @param mCurrentTimeLineColor The new time line color
+     */
+    public void setCurrentTimeLineColor(int mCurrentTimeLineColor) {
+        this.mCurrentTimeLineColor = mCurrentTimeLineColor;
+    }
+
+    /**
+     * Returns the current time line height
+     * @return The current time line height
+     */
+    public int getCurrentTimeLineHeight() {
+        return mCurrentTimeLineHeight;
+    }
+
+    /**
+     * Sets the current time line height
+     * @param mCurrentTimeLineHeight The new current time line height
+     */
+    public void setCurrentTimeLineHeight(int mCurrentTimeLineHeight) {
+        this.mCurrentTimeLineHeight = mCurrentTimeLineHeight;
+    }
+
     /////////////////////////////////////////////////////////////////
     //
     //      Functions related to scrolling.
