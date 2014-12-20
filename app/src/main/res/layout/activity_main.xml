@@ -27,6 +27,8 @@
         app:todayBackgroundColor="#1848adff"
         app:headerColumnBackground="#ffffffff"
         app:hourSeparatorColor="#22000000"
-        app:hourSeparatorHeight="2dp"/>
+        app:hourSeparatorHeight="2dp"
+        app:currentHourLineColor="#ff00aa00"
+        app:currentHourLineHeight="8dp"/>
 
 </RelativeLayout>

@@ -204,7 +204,7 @@ public class WeekView extends View {
         mContext = context;
 
         /**
-         * TODO: add currentTimeLine color and Height to attributes
+         * Done: add currentTimeLine color and Height to attributes (20141220)
          */
 
         // Get the attribute values (if any).
@@ -231,6 +231,8 @@ public class WeekView extends View {
             mDayNameLength = a.getInteger(R.styleable.WeekView_dayNameLength, mDayNameLength);
             mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
             mEventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, mEventMarginVertical);
+            mCurrentTimeLineColor = a.getColor(R.styleable.WeekView_currentHourLineColor, mCurrentTimeLineColor);
+            mCurrentTimeLineHeight = a.getDimensionPixelSize(R.styleable.WeekView_currentHourLineHeight, mCurrentTimeLineHeight);
         } finally {
             a.recycle();
         }
@@ -453,7 +455,7 @@ public class WeekView extends View {
             if (sameDay){
                 Calendar rightNow = Calendar.getInstance();
                 float currentTimeLine[] = new float[4];
-                float currentHour = (float) rightNow.HOUR_OF_DAY + (rightNow.MINUTE/60.0f);//7.25f;
+                float currentHour = (float) rightNow.get(Calendar.HOUR_OF_DAY) + (rightNow.get(Calendar.MINUTE)/60.00f);//7.25f;
                 float top = mHeaderTextHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * currentHour + mTimeTextHeight/2 + mHeaderMarginBottom;
                 currentTimeLine[0] = start;
                 currentTimeLine[1] = currentTimeLine[3] = top;

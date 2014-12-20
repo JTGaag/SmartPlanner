@@ -33,6 +33,8 @@
         </attr>
         <attr name="overlappingEventGap" format="dimension"/>
         <attr name="eventMarginVertical" format="dimension"/>
+        <attr name="currentHourLineColor" format="color"/>
+        <attr name="currentHourLineHeight" format="dimension"/>
 
     </declare-styleable>
 </resources>
