@@ -101,6 +101,7 @@ public class WeekView extends View {
     private int mEventMarginVertical = 0;
     private Calendar mFirstVisibleDay;
     private Calendar mLastVisibleDay;
+    private int mHourFormat = 2;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -189,6 +190,10 @@ public class WeekView extends View {
         NONE, HORIZONTAL, VERTICAL
     }
 
+    public enum HourFormat{
+        TWELVE, TWENTYFOUR;
+    }
+
     public WeekView(Context context) {
         this(context, null);
     }
@@ -205,6 +210,7 @@ public class WeekView extends View {
 
         /**
          * Done: add currentTimeLine color and Height to attributes (20141220)
+         * Done: possibility to set 12 or 24 hour format (20141221)
          */
 
         // Get the attribute values (if any).
@@ -233,6 +239,7 @@ public class WeekView extends View {
             mEventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, mEventMarginVertical);
             mCurrentTimeLineColor = a.getColor(R.styleable.WeekView_currentHourLineColor, mCurrentTimeLineColor);
             mCurrentTimeLineHeight = a.getDimensionPixelSize(R.styleable.WeekView_currentHourLineHeight, mCurrentTimeLineHeight);
+            mHourFormat = a.getInteger(R.styleable.WeekView_hourFormat, mHourFormat);
         } finally {
             a.recycle();
         }
@@ -325,12 +332,26 @@ public class WeekView extends View {
         // Set default event color.
         mDefaultEventColor = Color.parseColor("#9fc6e7");
 
+
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
         /**
          * Done: Get current time and verticaly scroll to the time (20141220)
+         * Done: Set limit (not before 0:00 and after 24:00 [moved code to onMeasure method to gein axcess to getHeight()] (20141221)
          */
         Calendar rightNow = Calendar.getInstance();
         float currentHour = (float) rightNow.get(Calendar.HOUR_OF_DAY) + (rightNow.get(Calendar.MINUTE)/60.00f);
         mCurrentOrigin.y = -(mHourHeight)*(currentHour-1);
+        //Set limit
+        if (mCurrentOrigin.y > 0){
+            mCurrentOrigin.y = 0;
+        }else if (mCurrentOrigin.y  < -(mHourHeight * 24 + mHeaderTextHeight + mHeaderRowPadding * 2 - getHeight())){
+            mCurrentOrigin.y = -(mHourHeight * 24 + mHeaderTextHeight + mHeaderRowPadding * 2 - getHeight());
+        }
     }
 
     @Override
@@ -402,6 +423,7 @@ public class WeekView extends View {
         float[] hourLines = new float[lineCount * 4];
 
         // Clear the cache for events rectangles.
+
         if (mEventRects != null) {
             for (EventRect eventRect: mEventRects) {
                 eventRect.rectF = null;
@@ -492,6 +514,7 @@ public class WeekView extends View {
 
     }
 
+
     /**
      * Draw all the events of a particular day.
      * @param date The day.
@@ -500,6 +523,7 @@ public class WeekView extends View {
      */
     private void drawEvents(Calendar date, float startFromPixel, Canvas canvas) {
         if (mEventRects != null && mEventRects.size() > 0) {
+            //Log.d("eventSize",Integer.toString(mEventRects.size()));
             for (int i = 0; i < mEventRects.size(); i++) {
                 if (isSameDay(mEventRects.get(i).event.getStartTime(), date)) {
 
@@ -1355,12 +1379,18 @@ public class WeekView extends View {
      * @return The string representation of the time.
      */
     private String getTimeString(int hour) {
-        String amPm;
-        if (hour >= 0 && hour < 12) amPm = "AM";
-        else amPm = "PM";
-        if (hour == 0) hour = 12;
-        if (hour > 12) hour -= 12;
-        return String.format("%02d %s", hour, amPm);
+        if (mHourFormat==1) {
+            String amPm;
+            if (hour >= 0 && hour < 12) amPm = "AM";
+            else amPm = "PM";
+            if (hour == 0) hour = 12;
+            if (hour > 12) hour -= 12;
+            return String.format("%02d %s", hour, amPm);
+        }else if (mHourFormat==2){
+            return String.format("%02d:00", hour);
+        }else{
+            return String.format("%02d:00", hour);
+        }
     }
 
 

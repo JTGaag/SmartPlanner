@@ -1,8 +1,10 @@
 package com.joost.smartplanner;
 
+import android.graphics.Color;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -10,6 +12,7 @@ import com.alamkanak.weekview.WeekView;
 import com.alamkanak.weekview.WeekViewEvent;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 
@@ -72,8 +75,26 @@ public class MainActivity extends ActionBarActivity implements WeekView.MonthCha
     //comment
     @Override
     public List<WeekViewEvent> onMonthChange(int newYear, int newMonth) {
+
+        /**
+         * TODO: make "getEvent(int newYear, int newMonth)"method to return events for the specific month and year to be drawn in the calendar
+         */
+
         // Populate the week view with some events.
         List<WeekViewEvent> events = new ArrayList<>();
+
+        Calendar startTime = Calendar.getInstance();
+        startTime.set(Calendar.MONTH, newMonth-1);
+        startTime.set(Calendar.YEAR, newYear);
+        Calendar endTime = (Calendar) startTime.clone();
+        endTime.add(Calendar.HOUR, 1);
+        endTime.set(Calendar.MONTH, newMonth-1);
+        endTime.set(Calendar.YEAR, newYear);
+
+        WeekViewEvent event = new WeekViewEvent(1, "Test Event", startTime, endTime);
+        event.setColor(Color.RED);
+
+        events.add(event);
         return events;
     }
 }

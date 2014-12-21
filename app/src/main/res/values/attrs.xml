@@ -10,6 +10,10 @@
             <enum name="friday" value="6"/>
             <enum name="saturday" value="7"/>
         </attr>
+        <attr name="hourFormat" format="enum">
+            <enum name="twelve" value="1"/>
+            <enum name="twentyfour" value="2"/>
+        </attr>
         <attr name="hourHeight" format="dimension"/>
         <attr name="textSize" format="dimension"/>
         <attr name="eventTextSize" format="dimension"/>

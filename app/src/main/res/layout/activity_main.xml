@@ -29,6 +29,7 @@
         app:hourSeparatorColor="#22000000"
         app:hourSeparatorHeight="2dp"
         app:currentHourLineColor="#ffaa0000"
-        app:currentHourLineHeight="2dp"/>
+        app:currentHourLineHeight="2dp"
+        app:hourFormat="twentyfour"/>
 
 </RelativeLayout>
