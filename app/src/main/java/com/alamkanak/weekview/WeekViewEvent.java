@@ -1,17 +1,21 @@
 package com.alamkanak.weekview;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://april-shower.com
  */
 public class WeekViewEvent {
-    private long mId;
-    private Calendar mStartTime;
-    private Calendar mEndTime;
-    private String mName;
-    private int mColor;
+    protected long mId;
+    protected Calendar mStartTime;
+    protected Calendar mEndTime;
+    protected String mName;
+    protected int mColor;
 
     public WeekViewEvent(){
 
@@ -62,6 +66,22 @@ public class WeekViewEvent {
         this.mName = name;
         this.mStartTime = startTime;
         this.mEndTime = endTime;
+    }
+
+    public WeekViewEvent(String jsonString) {
+        try {
+            JSONObject json = new JSONObject(jsonString);
+            this.mId = json.optLong("eventId");
+            this.mName = json.optString("name");
+            Calendar tStartTime = new GregorianCalendar();
+            Calendar tEndTime = new GregorianCalendar();
+            tStartTime.setTimeInMillis(json.optLong("startTime"));
+            tEndTime.setTimeInMillis(json.optLong("endTime"));
+            this.mStartTime = tStartTime;
+            this.mEndTime = tEndTime;
+        } catch (JSONException e) {
+
+        }
     }
 
 

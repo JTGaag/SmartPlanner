@@ -1,6 +1,11 @@
 package com.joost.smartplanner;
 
+import android.graphics.Color;
+
 import com.alamkanak.weekview.WeekViewEvent;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Calendar;
 
@@ -8,16 +13,18 @@ import java.util.Calendar;
  * Created by Joost on 21/12/2014.
  * TODO: Make EventManager to save and retreive smartEvents
  * DONE: Make eventDone variable and getter and setter (20141221)
+ * DONE: toJsonString and constructor from JsonString (20141221)
  */
 public class SmartEvent extends WeekViewEvent {
 
     private Boolean eventDone = false;
 
 
+
     /**
-     * Initializes the event for week view.
+     * Initializes the SmartEvent for week view.
      *
-     * @param id
+     * @param id          Id of event
      * @param name        Name of the event.
      * @param startYear   Year when the event starts.
      * @param startMonth  Month when the event starts.
@@ -32,18 +39,49 @@ public class SmartEvent extends WeekViewEvent {
      */
     public SmartEvent(long id, String name, int startYear, int startMonth, int startDay, int startHour, int startMinute, int endYear, int endMonth, int endDay, int endHour, int endMinute) {
         super(id, name, startYear, startMonth, startDay, startHour, startMinute, endYear, endMonth, endDay, endHour, endMinute);
+        mColor = Color.GREEN;
     }
 
     /**
-     * Initializes the event for week view.
+     * Initializes the SmartEvent for week view.
      *
-     * @param id
+     * @param id        Id of event
      * @param name      Name of the event.
      * @param startTime The time when the event starts.
      * @param endTime   The time when the event ends.
      */
     public SmartEvent(long id, String name, Calendar startTime, Calendar endTime) {
         super(id, name, startTime, endTime);
+        mColor = Color.GREEN;
+    }
+
+    /**
+     * Initializes the SmartEvent     *
+     * @param id        Id of event
+     * @param name      Name of the event.
+     * @param startTime The time when the event starts.
+     * @param endTime   The time when the event ends.
+     * @param color     The color of the event
+     */
+    public SmartEvent(long id, String name, Calendar startTime, Calendar endTime, int color) {
+        super(id, name, startTime, endTime);
+        mColor = color;
+    }
+
+    /**
+     * Create SmartEvent from JSONString
+     * @param jsonString String with the information of a previous created SmartEvent object
+     */
+    public SmartEvent(String jsonString){
+        super(jsonString);
+        //Try to parse string to JSONObject and get values from it
+        try {
+            JSONObject json = new JSONObject(jsonString);
+            this.mColor = json.getInt("color");
+        }catch(JSONException e){
+
+        }
+
     }
 
     public Boolean getEventDone() {
@@ -52,5 +90,19 @@ public class SmartEvent extends WeekViewEvent {
 
     public void setEventDone(Boolean eventDone) {
         this.eventDone = eventDone;
+    }
+
+    public String toJsonString() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("eventId", mId);
+            json.put("name", mName);
+            json.put("startTime", mStartTime.getTimeInMillis());
+            json.put("endTime", mEndTime.getTimeInMillis());
+            json.put("color", mColor);
+        }catch(JSONException e){
+
+        }
+        return json.toString();
     }
 }
