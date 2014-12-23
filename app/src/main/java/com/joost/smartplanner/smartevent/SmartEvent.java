@@ -11,7 +11,7 @@ import java.util.Calendar;
 
 /**
  * Created by Joost on 21/12/2014.
- * TODO: Make EventManager to save and retreive smartEvents
+ * DONE: Make EventManager to save and retreive smartEvents (DatabaseHelper) (20141223)
  * DONE: Make eventDone variable and getter and setter (20141221)
  * DONE: toJsonString and constructor from JsonString (20141221)
  */

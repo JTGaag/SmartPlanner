@@ -25,6 +25,8 @@ import android.view.View;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
+import com.joost.smartplanner.R;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -34,8 +36,9 @@ import java.util.List;
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://april-shower.com
+ * TODO: extend Original WeekView to make personal one without changing original code (Remove all the added features and put it into own code)
  */
-public class WeekView extends View {
+public class WeekViewEdited extends View {
 
     public static final int LENGTH_SHORT = 1;
     public static final int LENGTH_LONG = 2;
@@ -55,6 +58,7 @@ public class WeekView extends View {
     private float mWidthPerDay;
     private Paint mDayBackgroundPaint;
     private Paint mHourSeparatorPaint;
+    private Paint mCurrentTimeLinePaint;
     private float mHeaderMarginBottom;
     private Paint mTodayBackgroundPaint;
     private Paint mTodayHeaderTextPaint;
@@ -82,8 +86,10 @@ public class WeekView extends View {
     private int mHeaderRowBackgroundColor = Color.WHITE;
     private int mDayBackgroundColor = Color.rgb(245, 245, 245);
     private int mHourSeparatorColor = Color.rgb(230, 230, 230);
+    private int mCurrentTimeLineColor = Color.rgb(230, 0, 0);
     private int mTodayBackgroundColor = Color.rgb(239, 247, 254);
     private int mHourSeparatorHeight = 2;
+    private int mCurrentTimeLineHeight = 2;
     private int mTodayHeaderTextColor = Color.rgb(39, 137, 228);
     private int mEventTextSize = 12;
     private int mEventTextColor = Color.BLACK;
@@ -96,6 +102,7 @@ public class WeekView extends View {
     private int mEventMarginVertical = 0;
     private Calendar mFirstVisibleDay;
     private Calendar mLastVisibleDay;
+    private int mHourFormat = 2;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -140,7 +147,7 @@ public class WeekView extends View {
                 mScroller.fling(0, (int) mCurrentOrigin.y, 0, (int) velocityY, 0, 0, (int) -(mHourHeight * 24 + mHeaderTextHeight + mHeaderRowPadding * 2 - getHeight()), 0);
             }
 
-            ViewCompat.postInvalidateOnAnimation(WeekView.this);
+            ViewCompat.postInvalidateOnAnimation(WeekViewEdited.this);
             return true;
         }
 
@@ -184,44 +191,56 @@ public class WeekView extends View {
         NONE, HORIZONTAL, VERTICAL
     }
 
-    public WeekView(Context context) {
+    public enum HourFormat{
+        TWELVE, TWENTYFOUR;
+    }
+
+    public WeekViewEdited(Context context) {
         this(context, null);
     }
 
-    public WeekView(Context context, AttributeSet attrs) {
+    public WeekViewEdited(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public WeekView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public WeekViewEdited(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         // Hold references.
         mContext = context;
 
+        /**
+         * Done: add currentTimeLine color and Height to attributes (20141220)
+         * Done: possibility to set 12 or 24 hour format (20141221)
+         */
+
         // Get the attribute values (if any).
-        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0);
+        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.WeekViewEdited, 0, 0);
         try {
-            mFirstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, mFirstDayOfWeek);
-            mHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_hourHeight, mHourHeight);
-            mTextSize = a.getDimensionPixelSize(R.styleable.WeekView_textSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mTextSize, context.getResources().getDisplayMetrics()));
-            mHeaderColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerColumnPadding, mHeaderColumnPadding);
-            mColumnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, mColumnGap);
-            mHeaderColumnTextColor = a.getColor(R.styleable.WeekView_headerColumnTextColor, mHeaderColumnTextColor);
-            mNumberOfVisibleDays = a.getInteger(R.styleable.WeekView_noOfVisibleDays, mNumberOfVisibleDays);
-            mHeaderRowPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, mHeaderRowPadding);
-            mHeaderRowBackgroundColor = a.getColor(R.styleable.WeekView_headerRowBackgroundColor, mHeaderRowBackgroundColor);
-            mDayBackgroundColor = a.getColor(R.styleable.WeekView_dayBackgroundColor, mDayBackgroundColor);
-            mHourSeparatorColor = a.getColor(R.styleable.WeekView_hourSeparatorColor, mHourSeparatorColor);
-            mTodayBackgroundColor = a.getColor(R.styleable.WeekView_todayBackgroundColor, mTodayBackgroundColor);
-            mHourSeparatorHeight = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorHeight, mHourSeparatorHeight);
-            mTodayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, mTodayHeaderTextColor);
-            mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
-            mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
-            mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorHeight, mEventPadding);
-            mHeaderColumnBackgroundColor = a.getColor(R.styleable.WeekView_headerColumnBackground, mHeaderColumnBackgroundColor);
-            mDayNameLength = a.getInteger(R.styleable.WeekView_dayNameLength, mDayNameLength);
-            mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
-            mEventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, mEventMarginVertical);
+            mFirstDayOfWeek = a.getInteger(R.styleable.WeekViewEdited_firstDayOfWeek, mFirstDayOfWeek);
+            mHourHeight = a.getDimensionPixelSize(R.styleable.WeekViewEdited_hourHeight, mHourHeight);
+            mTextSize = a.getDimensionPixelSize(R.styleable.WeekViewEdited_textSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mTextSize, context.getResources().getDisplayMetrics()));
+            mHeaderColumnPadding = a.getDimensionPixelSize(R.styleable.WeekViewEdited_headerColumnPadding, mHeaderColumnPadding);
+            mColumnGap = a.getDimensionPixelSize(R.styleable.WeekViewEdited_columnGap, mColumnGap);
+            mHeaderColumnTextColor = a.getColor(R.styleable.WeekViewEdited_headerColumnTextColor, mHeaderColumnTextColor);
+            mNumberOfVisibleDays = a.getInteger(R.styleable.WeekViewEdited_noOfVisibleDays, mNumberOfVisibleDays);
+            mHeaderRowPadding = a.getDimensionPixelSize(R.styleable.WeekViewEdited_headerRowPadding, mHeaderRowPadding);
+            mHeaderRowBackgroundColor = a.getColor(R.styleable.WeekViewEdited_headerRowBackgroundColor, mHeaderRowBackgroundColor);
+            mDayBackgroundColor = a.getColor(R.styleable.WeekViewEdited_dayBackgroundColor, mDayBackgroundColor);
+            mHourSeparatorColor = a.getColor(R.styleable.WeekViewEdited_hourSeparatorColor, mHourSeparatorColor);
+            mTodayBackgroundColor = a.getColor(R.styleable.WeekViewEdited_todayBackgroundColor, mTodayBackgroundColor);
+            mHourSeparatorHeight = a.getDimensionPixelSize(R.styleable.WeekViewEdited_hourSeparatorHeight, mHourSeparatorHeight);
+            mTodayHeaderTextColor = a.getColor(R.styleable.WeekViewEdited_todayHeaderTextColor, mTodayHeaderTextColor);
+            mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekViewEdited_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
+            mEventTextColor = a.getColor(R.styleable.WeekViewEdited_eventTextColor, mEventTextColor);
+            mEventPadding = a.getDimensionPixelSize(R.styleable.WeekViewEdited_hourSeparatorHeight, mEventPadding);
+            mHeaderColumnBackgroundColor = a.getColor(R.styleable.WeekViewEdited_headerColumnBackground, mHeaderColumnBackgroundColor);
+            mDayNameLength = a.getInteger(R.styleable.WeekViewEdited_dayNameLength, mDayNameLength);
+            mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekViewEdited_overlappingEventGap, mOverlappingEventGap);
+            mEventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekViewEdited_eventMarginVertical, mEventMarginVertical);
+            mCurrentTimeLineColor = a.getColor(R.styleable.WeekViewEdited_currentHourLineColor, mCurrentTimeLineColor);
+            mCurrentTimeLineHeight = a.getDimensionPixelSize(R.styleable.WeekViewEdited_currentHourLineHeight, mCurrentTimeLineHeight);
+            mHourFormat = a.getInteger(R.styleable.WeekViewEdited_hourFormat, mHourFormat);
         } finally {
             a.recycle();
         }
@@ -275,6 +294,16 @@ public class WeekView extends View {
         mHourSeparatorPaint.setStrokeWidth(mHourSeparatorHeight);
         mHourSeparatorPaint.setColor(mHourSeparatorColor);
 
+        /**
+         * Added by Joost
+         * Prepare current time color paint
+         */
+        mCurrentTimeLinePaint = new Paint();
+        mCurrentTimeLinePaint.setStyle(Paint.Style.STROKE);
+        mCurrentTimeLinePaint.setStrokeWidth(mCurrentTimeLineHeight);
+        mCurrentTimeLinePaint.setColor(mCurrentTimeLineColor);
+
+
         // Prepare today background color paint.
         mTodayBackgroundPaint = new Paint();
         mTodayBackgroundPaint.setColor(mTodayBackgroundColor);
@@ -303,6 +332,27 @@ public class WeekView extends View {
 
         // Set default event color.
         mDefaultEventColor = Color.parseColor("#9fc6e7");
+
+
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        /**
+         * Done: Get current time and verticaly scroll to the time (20141220)
+         * Done: Set limit (not before 0:00 and after 24:00 [moved code to onMeasure method to gein axcess to getHeight()] (20141221)
+         */
+        Calendar rightNow = Calendar.getInstance();
+        float currentHour = (float) rightNow.get(Calendar.HOUR_OF_DAY) + (rightNow.get(Calendar.MINUTE)/60.00f);
+        mCurrentOrigin.y = -(mHourHeight)*(currentHour-1);
+        //Set limit
+        if (mCurrentOrigin.y > 0){
+            mCurrentOrigin.y = 0;
+        }else if (mCurrentOrigin.y  < -(mHourHeight * 24 + mHeaderTextHeight + mHeaderRowPadding * 2 - getHeight())){
+            mCurrentOrigin.y = -(mHourHeight * 24 + mHeaderTextHeight + mHeaderRowPadding * 2 - getHeight());
+        }
     }
 
     @Override
@@ -374,6 +424,7 @@ public class WeekView extends View {
         float[] hourLines = new float[lineCount * 4];
 
         // Clear the cache for events rectangles.
+
         if (mEventRects != null) {
             for (EventRect eventRect: mEventRects) {
                 eventRect.rectF = null;
@@ -422,6 +473,22 @@ public class WeekView extends View {
             // Draw the lines for hours.
             canvas.drawLines(hourLines, mHourSeparatorPaint);
 
+            /**
+             * Edit by Joost
+             * Draw hour line
+             * Done: Set Line on right time (20141219)
+             */
+            if (sameDay){
+                Calendar rightNow = Calendar.getInstance();
+                float currentTimeLine[] = new float[4];
+                float currentHour = (float) rightNow.get(Calendar.HOUR_OF_DAY) + (rightNow.get(Calendar.MINUTE)/60.00f);//7.25f;
+                float top = mHeaderTextHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * currentHour + mTimeTextHeight/2 + mHeaderMarginBottom;
+                currentTimeLine[0] = start;
+                currentTimeLine[1] = currentTimeLine[3] = top;
+                currentTimeLine[2] = startPixel + mWidthPerDay;
+                canvas.drawLines(currentTimeLine, mCurrentTimeLinePaint);
+            }
+
             // Draw the events.
             drawEvents(day, startPixel, canvas);
 
@@ -448,6 +515,7 @@ public class WeekView extends View {
 
     }
 
+
     /**
      * Draw all the events of a particular day.
      * @param date The day.
@@ -456,6 +524,7 @@ public class WeekView extends View {
      */
     private void drawEvents(Calendar date, float startFromPixel, Canvas canvas) {
         if (mEventRects != null && mEventRects.size() > 0) {
+            //Log.d("eventSize",Integer.toString(mEventRects.size()));
             for (int i = 0; i < mEventRects.size(); i++) {
                 if (isSameDay(mEventRects.get(i).event.getStartTime(), date)) {
 
@@ -1071,8 +1140,8 @@ public class WeekView extends View {
     /**
      * Set the length of the day name displayed in the header row. Example of short day names is
      * 'M' for 'Monday' and example of long day names is 'Mon' for 'Monday'.
-     * @param length Supported values are {@link com.alamkanak.weekview.WeekView#LENGTH_SHORT} and
-     * {@link com.alamkanak.weekview.WeekView#LENGTH_LONG}.
+     * @param length Supported values are {@link com.alamkanak.weekview.WeekViewEdited#LENGTH_SHORT} and
+     * {@link com.alamkanak.weekview.WeekViewEdited#LENGTH_LONG}.
      */
     public void setDayNameLength(int length) {
         if (length != LENGTH_LONG && length != LENGTH_SHORT) {
@@ -1124,6 +1193,38 @@ public class WeekView extends View {
         return mLastVisibleDay;
     }
 
+    /**
+     * Returns the current time line color
+     * @return The current time line color
+     */
+    public int getCurrentTimeLineColor() {
+        return mCurrentTimeLineColor;
+    }
+
+    /**
+     * Set the current time line color
+     * @param mCurrentTimeLineColor The new time line color
+     */
+    public void setCurrentTimeLineColor(int mCurrentTimeLineColor) {
+        this.mCurrentTimeLineColor = mCurrentTimeLineColor;
+    }
+
+    /**
+     * Returns the current time line height
+     * @return The current time line height
+     */
+    public int getCurrentTimeLineHeight() {
+        return mCurrentTimeLineHeight;
+    }
+
+    /**
+     * Sets the current time line height
+     * @param mCurrentTimeLineHeight The new current time line height
+     */
+    public void setCurrentTimeLineHeight(int mCurrentTimeLineHeight) {
+        this.mCurrentTimeLineHeight = mCurrentTimeLineHeight;
+    }
+
     /////////////////////////////////////////////////////////////////
     //
     //      Functions related to scrolling.
@@ -1138,7 +1239,7 @@ public class WeekView extends View {
                 float leftDays = Math.round(mCurrentOrigin.x / (mWidthPerDay + mColumnGap));
                 int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * (mWidthPerDay+mColumnGap));
                 mStickyScroller.startScroll((int) mCurrentOrigin.x, 0, - nearestOrigin, 0);
-                ViewCompat.postInvalidateOnAnimation(WeekView.this);
+                ViewCompat.postInvalidateOnAnimation(WeekViewEdited.this);
             }
             mCurrentScrollDirection = Direction.NONE;
         }
@@ -1155,7 +1256,7 @@ public class WeekView extends View {
                 float leftDays = Math.round(mCurrentOrigin.x / (mWidthPerDay + mColumnGap));
                 int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * (mWidthPerDay+mColumnGap));
                 mStickyScroller.startScroll((int) mCurrentOrigin.x, 0, - nearestOrigin, 0);
-                ViewCompat.postInvalidateOnAnimation(WeekView.this);
+                ViewCompat.postInvalidateOnAnimation(WeekViewEdited.this);
             }
             else {
                 if (mCurrentFlingDirection == Direction.VERTICAL) mCurrentOrigin.y = mScroller.getCurrY();
@@ -1279,12 +1380,18 @@ public class WeekView extends View {
      * @return The string representation of the time.
      */
     private String getTimeString(int hour) {
-        String amPm;
-        if (hour >= 0 && hour < 12) amPm = "AM";
-        else amPm = "PM";
-        if (hour == 0) hour = 12;
-        if (hour > 12) hour -= 12;
-        return String.format("%02d %s", hour, amPm);
+        if (mHourFormat==1) {
+            String amPm;
+            if (hour >= 0 && hour < 12) amPm = "AM";
+            else amPm = "PM";
+            if (hour == 0) hour = 12;
+            if (hour > 12) hour -= 12;
+            return String.format("%02d %s", hour, amPm);
+        }else if (mHourFormat==2){
+            return String.format("%02d:00", hour);
+        }else{
+            return String.format("%02d:00", hour);
+        }
     }
 
 

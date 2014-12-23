@@ -4,11 +4,10 @@ import android.graphics.Color;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.alamkanak.weekview.WeekView;
+import com.alamkanak.weekview.WeekViewEdited;
 import com.alamkanak.weekview.WeekViewEvent;
 
 import java.util.ArrayList;
@@ -16,9 +15,9 @@ import java.util.Calendar;
 import java.util.List;
 
 
-public class MainActivity extends ActionBarActivity implements WeekView.MonthChangeListener, WeekView.EventClickListener, WeekView.EventLongPressListener{
+public class MainActivity extends ActionBarActivity implements WeekViewEdited.MonthChangeListener, WeekViewEdited.EventClickListener, WeekViewEdited.EventLongPressListener{
 
-    private WeekView mWeekView;
+    private WeekViewEdited mWeekView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +25,7 @@ public class MainActivity extends ActionBarActivity implements WeekView.MonthCha
         setContentView(R.layout.activity_main);
 
         // Get a reference for the week view in the layout.
-        mWeekView = (WeekView) findViewById(R.id.weekView);
+        mWeekView = (WeekViewEdited) findViewById(R.id.weekView);
 
         // Set an action when any event is clicked.
         mWeekView.setOnEventClickListener(this);

@@ -16,6 +16,7 @@ import java.util.Locale;
 
 /**
  * Created by Joost on 23/12/2014.
+ * TODO: Test DatabaseHelper
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
