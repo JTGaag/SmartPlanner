@@ -25,6 +25,8 @@ import android.view.View;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
+import com.joost.smartplanner.R;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -37,9 +39,10 @@ import java.util.List;
  */
 public class WeekView extends View {
 
+
     public static final int LENGTH_SHORT = 1;
     public static final int LENGTH_LONG = 2;
-    private final Context mContext;
+    protected final Context mContext;
     private Calendar mToday;
     private Calendar mStartDate;
     private Paint mTimeTextPaint;
@@ -229,6 +232,11 @@ public class WeekView extends View {
         init();
     }
 
+
+
+
+
+
     private void init() {
         // Get the date today.
         mToday = Calendar.getInstance();
@@ -315,14 +323,19 @@ public class WeekView extends View {
         // Draw the time column and all the axes/separators.
         drawTimeColumnAndAxes(canvas);
 
+        drawHideRect(canvas);
+        }
+
+    protected void drawHideRect(Canvas canvas){
         // Hide everything in the first cell (top left corner).
         canvas.drawRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
 
         // Hide anything that is in the bottom margin of the header row.
         canvas.drawRect(mHeaderColumnWidth, mHeaderTextHeight + mHeaderRowPadding * 2, getWidth(), mHeaderRowPadding * 2 + mHeaderTextHeight + mHeaderMarginBottom + mTimeTextHeight/2 - mHourSeparatorHeight / 2, mHeaderColumnBackgroundPaint);
+
     }
 
-    private void drawTimeColumnAndAxes(Canvas canvas) {
+    protected void drawTimeColumnAndAxes(Canvas canvas) {
         // Do not let the view go above/below the limit due to scrolling. Set the max and min limit of the scroll.
         if (mCurrentScrollDirection == Direction.VERTICAL) {
             if (mCurrentOrigin.y - mDistanceY > 0) mCurrentOrigin.y = 0;
@@ -341,7 +354,7 @@ public class WeekView extends View {
         }
     }
 
-    private void drawHeaderRowAndEvents(Canvas canvas) {
+    protected void drawHeaderRowAndEvents(Canvas canvas) {
         // Calculate the available width for each day.
         mHeaderColumnWidth = mTimeTextWidth + mHeaderColumnPadding *2;
         mWidthPerDay = getWidth() - mHeaderColumnWidth - mColumnGap * (mNumberOfVisibleDays - 1);
@@ -429,14 +442,33 @@ public class WeekView extends View {
             startPixel += mWidthPerDay + mColumnGap;
         }
 
+
+
+
+        //drawHeaderAndText(canvas, leftDaysWithGaps, startFromPixel);
+//        startPixel = startFromPixel;
+//        for (int dayNumber=leftDaysWithGaps+1; dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1; dayNumber++) {
+//            // Check if the day is today.
+//            day = (Calendar) mToday.clone();
+//            day.add(Calendar.DATE, dayNumber - 1);
+//            boolean sameDay = isSameDay(day, mToday);
+//
+//            // Draw the day labels.
+//            String dayLabel = String.format("%s %d/%02d", getDayName(day), day.get(Calendar.MONTH) + 1, day.get(Calendar.DAY_OF_MONTH));
+//            canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
+//            startPixel += mWidthPerDay + mColumnGap;
+//        }
+
+    }
+
+    protected void drawHeaderAndText(Canvas canvas, int leftDaysWithGaps, float startPixel){
         // Draw the header background.
         canvas.drawRect(0, 0, getWidth(), mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
 
         // Draw the header row texts.
-        startPixel = startFromPixel;
         for (int dayNumber=leftDaysWithGaps+1; dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1; dayNumber++) {
             // Check if the day is today.
-            day = (Calendar) mToday.clone();
+            Calendar day = (Calendar) mToday.clone();
             day.add(Calendar.DATE, dayNumber - 1);
             boolean sameDay = isSameDay(day, mToday);
 
@@ -445,7 +477,6 @@ public class WeekView extends View {
             canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
             startPixel += mWidthPerDay + mColumnGap;
         }
-
     }
 
     /**
@@ -1124,6 +1155,36 @@ public class WeekView extends View {
         return mLastVisibleDay;
     }
 
+    public PointF getCurrentOrigin() {
+        return mCurrentOrigin;
+    }
+
+    public float getWidthPerDay() {
+        return mWidthPerDay;
+    }
+
+    public Calendar getToday() {
+        return mToday;
+    }
+
+    public float getHeaderTextHeight() {
+        return mHeaderTextHeight;
+    }
+
+    public float getHeaderMarginBottom() {
+        return mHeaderMarginBottom;
+    }
+
+    public float getTimeTextHeight() {
+        return mTimeTextHeight;
+    }
+
+    public float getHeaderColumnWidth() {
+        return mHeaderColumnWidth;
+    }
+
+
+
     /////////////////////////////////////////////////////////////////
     //
     //      Functions related to scrolling.
@@ -1169,6 +1230,10 @@ public class WeekView extends View {
         }
     }
 
+
+    public void setmFirstVisibleDay(Calendar mFirstVisibleDay) {
+        this.mFirstVisibleDay = mFirstVisibleDay;
+    }
 
     /////////////////////////////////////////////////////////////////
     //
@@ -1278,7 +1343,7 @@ public class WeekView extends View {
      * @param hour The time. Limit: 0-23.
      * @return The string representation of the time.
      */
-    private String getTimeString(int hour) {
+    protected String getTimeString(int hour) {
         String amPm;
         if (hour >= 0 && hour < 12) amPm = "AM";
         else amPm = "PM";
@@ -1294,7 +1359,7 @@ public class WeekView extends View {
      * @param dayTwo The second day.
      * @return Whether the times are on the same day.
      */
-    private boolean isSameDay(Calendar dayOne, Calendar dayTwo) {
+    protected boolean isSameDay(Calendar dayOne, Calendar dayTwo) {
         return dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR) && dayOne.get(Calendar.DAY_OF_YEAR) == dayTwo.get(Calendar.DAY_OF_YEAR);
     }
 

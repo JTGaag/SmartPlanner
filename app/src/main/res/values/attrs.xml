@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="WeekViewEdited">
+    <declare-styleable name="WeekView">
         <attr name="firstDayOfWeek" format="enum">
             <enum name="sunday" value="1"/>
             <enum name="monday" value="2"/>
@@ -9,10 +9,6 @@
             <enum name="thursday" value="5"/>
             <enum name="friday" value="6"/>
             <enum name="saturday" value="7"/>
-        </attr>
-        <attr name="hourFormat" format="enum">
-            <enum name="twelve" value="1"/>
-            <enum name="twentyfour" value="2"/>
         </attr>
         <attr name="hourHeight" format="dimension"/>
         <attr name="textSize" format="dimension"/>
@@ -37,8 +33,14 @@
         </attr>
         <attr name="overlappingEventGap" format="dimension"/>
         <attr name="eventMarginVertical" format="dimension"/>
+
+    </declare-styleable>
+    <declare-styleable name="SmartWeekView">
+        <attr name="hourFormat" format="enum">
+            <enum name="twelve" value="1"/>
+            <enum name="twentyfour" value="2"/>
+        </attr>
         <attr name="currentHourLineColor" format="color"/>
         <attr name="currentHourLineHeight" format="dimension"/>
-
     </declare-styleable>
 </resources>

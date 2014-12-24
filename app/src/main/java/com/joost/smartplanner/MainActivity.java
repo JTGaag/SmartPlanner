@@ -7,7 +7,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.alamkanak.weekview.WeekViewEdited;
+import com.alamkanak.weekview.SmartWeekView;
 import com.alamkanak.weekview.WeekViewEvent;
 
 import java.util.ArrayList;
@@ -15,9 +15,9 @@ import java.util.Calendar;
 import java.util.List;
 
 
-public class MainActivity extends ActionBarActivity implements WeekViewEdited.MonthChangeListener, WeekViewEdited.EventClickListener, WeekViewEdited.EventLongPressListener{
+public class MainActivity extends ActionBarActivity implements SmartWeekView.MonthChangeListener, SmartWeekView.EventClickListener, SmartWeekView.EventLongPressListener{
 
-    private WeekViewEdited mWeekView;
+    private SmartWeekView mWeekView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +25,7 @@ public class MainActivity extends ActionBarActivity implements WeekViewEdited.Mo
         setContentView(R.layout.activity_main);
 
         // Get a reference for the week view in the layout.
-        mWeekView = (WeekViewEdited) findViewById(R.id.weekView);
+        mWeekView = (SmartWeekView) findViewById(R.id.weekView);
 
         // Set an action when any event is clicked.
         mWeekView.setOnEventClickListener(this);
@@ -83,10 +83,11 @@ public class MainActivity extends ActionBarActivity implements WeekViewEdited.Mo
         List<WeekViewEvent> events = new ArrayList<>();
 
         Calendar startTime = Calendar.getInstance();
+        startTime.add(Calendar.HOUR, 1);
         startTime.set(Calendar.MONTH, newMonth-1);
         startTime.set(Calendar.YEAR, newYear);
         Calendar endTime = (Calendar) startTime.clone();
-        endTime.add(Calendar.HOUR, 1);
+        endTime.add(Calendar.HOUR, 2);
         endTime.set(Calendar.MONTH, newMonth-1);
         endTime.set(Calendar.YEAR, newYear);
 
