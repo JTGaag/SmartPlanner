@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.Locale;
 
 /**
  * Created by Joost on 23/12/2014.
- * TODO: Test DatabaseHelper
+ * DONE: Test DatabaseHelper (20141226)
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -24,7 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String LOG = "DatabaseHelper";
 
     // Database version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     //Database name
     private static final String DATABASE_NAME = "smartPlannerDatabase";
@@ -45,11 +46,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //Create Tables
     private static final String CREATE_TABLE_EVENT = "CREATE TABLE "
-            + TABLE_EVENT + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_EVENT_NAME + " TEXT," + KEY_EVENT_STARTTIME + " INTEGER"
-            + KEY_EVENT_ENDTIME + " INTEGER" + KEY_CREATED_AT + " DATETIME" + ")";
+            + TABLE_EVENT + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_EVENT_NAME + " TEXT," + KEY_EVENT_STARTTIME + " INTEGER,"
+            + KEY_EVENT_ENDTIME + " INTEGER," + KEY_EVENT_COLOR + " INTEGER,"+ KEY_CREATED_AT + " DATETIME" + ")";
 
     public DatabaseHelper(Context context){
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        //TODO: After testing save database in secure location (not on SDCard)
+        super(context, "/mnt/sdcard/"+DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
@@ -121,17 +123,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
-        Calendar startTime = new GregorianCalendar();
-        Calendar endTime = new GregorianCalendar();
 
         if(c.moveToFirst()){
             do{
+                //Log.d("Event", "Name: " + c.getString(c.getColumnIndex(KEY_EVENT_NAME)) + " StartTime: " + Long.toString(c.getLong(c.getColumnIndex(KEY_EVENT_STARTTIME))));
+                Calendar startTime = new GregorianCalendar();
+                Calendar endTime = new GregorianCalendar();
                 startTime.setTimeInMillis(c.getLong(c.getColumnIndex(KEY_EVENT_STARTTIME)));
                 endTime.setTimeInMillis(c.getLong(c.getColumnIndex(KEY_EVENT_ENDTIME)));
-                SmartEvent smartEvent = new SmartEvent(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_EVENT_NAME)), startTime, endTime,c.getInt(c.getColumnIndex(KEY_EVENT_COLOR)));
+                SmartEvent smartEvent = new SmartEvent(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_EVENT_NAME)), startTime, endTime, c.getInt(c.getColumnIndex(KEY_EVENT_COLOR)));
+                Log.d("SmartEvent", smartEvent.toJsonString());
                 events.add(smartEvent);
             }while(c.moveToNext());
         }
+
+        //Log.d("Event list", events.toString());
         return events;
     }
 
