@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import com.joost.smartplanner.R;
 
@@ -14,7 +13,8 @@ import java.util.Calendar;
 
 /**
  * Created by Joost on 23/12/2014.
- * TODO: get all the added features in this class
+ * DONE: get all the added features in this class (20141224)
+ * TODO: Override all gestures in SmartWeekView (to get clean WeekView)
  */
 public class SmartWeekView extends WeekView {
 
@@ -30,6 +30,7 @@ public class SmartWeekView extends WeekView {
         TWELVE, TWENTYFOUR;
     }
 
+
     public SmartWeekView(Context context) {
         this(context, null);
     }
@@ -41,7 +42,6 @@ public class SmartWeekView extends WeekView {
     public SmartWeekView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        Log.d("Satus", "Start Constructor after super");
 
         /**
          * DONE: fix read xml attributes (Constructor error) (20141224)
@@ -172,6 +172,12 @@ public class SmartWeekView extends WeekView {
     public void setCurrentTimeLineHeight(int mCurrentTimeLineHeight) {
         this.mCurrentTimeLineHeight = mCurrentTimeLineHeight;
     }
+
+
+
+
+
+
 
     @Override
     protected String getTimeString(int hour) {

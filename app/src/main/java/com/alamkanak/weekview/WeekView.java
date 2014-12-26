@@ -72,6 +72,7 @@ public class WeekView extends View {
     private float mDistanceY = 0;
     private float mDistanceX = 0;
     private Direction mCurrentFlingDirection = Direction.NONE;
+    protected Boolean eventClicked = false;
 
     // Attributes and their default values.
     private int mHourHeight = 50;
@@ -104,6 +105,7 @@ public class WeekView extends View {
     private EventClickListener mEventClickListener;
     private EventLongPressListener mEventLongPressListener;
     private MonthChangeListener mMonthChangeListener;
+    private EmptyClickListener mEmptyClickListener;
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
         @Override
@@ -150,16 +152,45 @@ public class WeekView extends View {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
+            eventClicked = false;
             if (mEventRects != null && mEventClickListener != null) {
                 List<EventRect> reversedEventRects = mEventRects;
                 Collections.reverse(reversedEventRects);
                 for (EventRect event : reversedEventRects) {
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
+                        eventClicked  = true;
                         mEventClickListener.onEventClick(event.originalEvent, event.rectF);
                         playSoundEffect(SoundEffectConstants.CLICK);
                         break;
                     }
                 }
+            }
+            if (!eventClicked) {
+                float mHeaderRowHeight = (mHeaderTextHeight + mHeaderRowPadding * 2);
+                //Only do something when clicked in agenda area (not in header (horizontal and vertical))
+                if(e.getX() > mHeaderColumnWidth && e.getY() > mHeaderRowHeight) {
+
+                    Calendar tappedDay = (Calendar) mToday.clone();
+
+                    //Which day is tapped (on the screen)
+                    int tapDay = (int) Math.floor((e.getX()-mHeaderColumnWidth)/(mWidthPerDay + mColumnGap));
+                    //Most left day
+                    int leftDaysWithGaps = (int) -(Math.round(mCurrentOrigin.x / (mWidthPerDay + mColumnGap)));
+                    //Combining both results in actual day tapped from today
+                    int dayDiff = tapDay + leftDaysWithGaps;
+
+                    float tappedTime = (e.getY() - mHeaderRowHeight - mCurrentOrigin.y)/(mHourHeight);
+                    int tappedHour = (int) Math.floor(tappedTime);
+                    int tappedMinute = (int) Math.floor((tappedTime % 1)*60);
+
+                    tappedDay.add(Calendar.DAY_OF_WEEK, dayDiff);
+                    tappedDay.set(Calendar.HOUR_OF_DAY, tappedHour);
+                    tappedDay.set(Calendar.MINUTE, tappedMinute);
+
+
+                    //mEmptyClickListener.onEmptyClickCalendar(tappedDay);
+                }
+
             }
             return super.onSingleTapConfirmed(e);
         }
@@ -167,17 +198,47 @@ public class WeekView extends View {
         @Override
         public void onLongPress(MotionEvent e) {
             super.onLongPress(e);
-
+            eventClicked = false;
             if (mEventLongPressListener != null && mEventRects != null) {
                 List<EventRect> reversedEventRects = mEventRects;
                 Collections.reverse(reversedEventRects);
                 for (EventRect event : reversedEventRects) {
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
                         mEventLongPressListener.onEventLongPress(event.originalEvent, event.rectF);
+                        eventClicked = true;
                         performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
                         break;
                     }
                 }
+            }
+
+            if (!eventClicked) {
+                float mHeaderRowHeight = (mHeaderTextHeight + mHeaderRowPadding * 2);
+                //DONE: get from X and Y coordinate the right calendar object to create a new SmartEvent (20141226)
+                //Only do something when clicked in agenda area (not in header (horizontal and vertical))
+                if(e.getX() > mHeaderColumnWidth && e.getY() > mHeaderRowHeight) {
+
+                    Calendar tappedDay = (Calendar) mToday.clone();
+
+                    //Which day is tapped (on the screen)
+                    int tapDay = (int) Math.floor((e.getX()-mHeaderColumnWidth)/(mWidthPerDay + mColumnGap));
+                    //Most left day
+                    int leftDaysWithGaps = (int) -(Math.round(mCurrentOrigin.x / (mWidthPerDay + mColumnGap)));
+                    //Combining both results in actual day tapped from today
+                    int dayDiff = tapDay + leftDaysWithGaps;
+
+                    float tappedTime = (e.getY() - mHeaderRowHeight - mCurrentOrigin.y)/(mHourHeight);
+                    int tappedHour = (int) Math.floor(tappedTime);
+                    int tappedMinute = (int) Math.floor((tappedTime % 1)*60);
+
+                    tappedDay.add(Calendar.DAY_OF_WEEK, dayDiff);
+                    tappedDay.set(Calendar.HOUR_OF_DAY, tappedHour);
+                    tappedDay.set(Calendar.MINUTE, tappedMinute);
+
+
+                    mEmptyClickListener.onEmptyClickCalendar(tappedDay);
+                }
+
             }
         }
     };
@@ -898,6 +959,14 @@ public class WeekView extends View {
         this.mEventLongPressListener = eventLongPressListener;
     }
 
+    public EmptyClickListener getEmptyClickListener() {
+        return mEmptyClickListener;
+    }
+
+    public void setEmptyClickListener(EmptyClickListener mEmptyClickListener) {
+        this.mEmptyClickListener = mEmptyClickListener;
+    }
+
     /**
      * Get the number of visible days in a week.
      * @return The number of visible days in a week.
@@ -1315,6 +1384,11 @@ public class WeekView extends View {
 
     public interface EventLongPressListener {
         public void onEventLongPress(WeekViewEvent event, RectF eventRect);
+    }
+
+    public interface EmptyClickListener {
+        public void onEmptyClickXY(float x, float y);
+        public void onEmptyClickCalendar(Calendar tappedDay);
     }
 
     /////////////////////////////////////////////////////////////////

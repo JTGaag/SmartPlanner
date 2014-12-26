@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -14,10 +15,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * TODO: Add database helper to mainActivity
+ * TODO: Add Event when longPressed (already impl in WeekView)
+ * TODO: Get Events from database
+ */
+public class MainActivity extends ActionBarActivity implements SmartWeekView.MonthChangeListener, SmartWeekView.EventClickListener, SmartWeekView.EventLongPressListener, SmartWeekView.EmptyClickListener{
 
-public class MainActivity extends ActionBarActivity implements SmartWeekView.MonthChangeListener, SmartWeekView.EventClickListener, SmartWeekView.EventLongPressListener{
-
-    private SmartWeekView mWeekView;
+    private SmartWeekView mSmartWeekView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,17 +30,20 @@ public class MainActivity extends ActionBarActivity implements SmartWeekView.Mon
         setContentView(R.layout.activity_main);
 
         // Get a reference for the week view in the layout.
-        mWeekView = (SmartWeekView) findViewById(R.id.weekView);
+        mSmartWeekView = (SmartWeekView) findViewById(R.id.weekView);
 
         // Set an action when any event is clicked.
-        mWeekView.setOnEventClickListener(this);
+        mSmartWeekView.setOnEventClickListener(this);
 
         // The week view has infinite scrolling horizontally. We have to provide the events of a
         // month every time the month changes on the week view.
-        mWeekView.setMonthChangeListener(this);
+        mSmartWeekView.setMonthChangeListener(this);
 
         // Set long press listener for events.
-        mWeekView.setEventLongPressListener(this);
+        mSmartWeekView.setEventLongPressListener(this);
+
+        //Set emptyClickListener
+        mSmartWeekView.setEmptyClickListener(this);
     }
 
 
@@ -96,5 +104,19 @@ public class MainActivity extends ActionBarActivity implements SmartWeekView.Mon
 
         events.add(event);
         return events;
+    }
+
+    @Override
+    public void onEmptyClickXY(float x, float y) {
+        Log.d("coordinates", "X: " + Float.toString(x) + " Y: " + Float.toString(y) );
+
+        int leftDaysWithGaps = (int) -(Math.round(mSmartWeekView.getCurrentOrigin().x / (mSmartWeekView.getWidthPerDay() + mSmartWeekView.getColumnGap())));
+        Log.d("leftDaysWithGap", "LeftDaysWithGap: " + Integer.toString(leftDaysWithGaps));
+        Log.d("DayWidth", Float.toString(mSmartWeekView.getWidthPerDay() + mSmartWeekView.getColumnGap()));
+    }
+
+    @Override
+    public void onEmptyClickCalendar(Calendar tappedDay) {
+        Log.d("Calendar Object", tappedDay.toString());
     }
 }
