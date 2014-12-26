@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import com.joost.smartplanner.R;
 
@@ -15,6 +16,7 @@ import java.util.Calendar;
  * Created by Joost on 23/12/2014.
  * DONE: get all the added features in this class (20141224)
  * TODO: Override all gestures in SmartWeekView (to get clean WeekView)
+ * TODO: Draw view directly correct (date not half)
  */
 public class SmartWeekView extends WeekView {
 
@@ -68,7 +70,7 @@ public class SmartWeekView extends WeekView {
         mCurrentTimeLinePaint.setStrokeWidth(mCurrentTimeLineHeight);
         mCurrentTimeLinePaint.setColor(mCurrentTimeLineColor);
 
-
+        this.invalidate();
     }
 
     @Override
@@ -98,7 +100,7 @@ public class SmartWeekView extends WeekView {
     @Override
     protected void onDraw(Canvas canvas) {
         //super.onDraw(canvas);
-
+        Log.d("SmartWeekView", "onDraw started");
         //Variables needed
         int leftDaysWithGaps = (int) -(Math.ceil(getCurrentOrigin().x / (getWidthPerDay() + getColumnGap())));
         float startPixel = getCurrentOrigin().x + (getWidthPerDay() + getColumnGap()) * leftDaysWithGaps + getHeaderColumnWidth();
@@ -116,7 +118,7 @@ public class SmartWeekView extends WeekView {
         drawTimeColumnAndAxes(canvas);
 
         drawHideRect(canvas);
-
+        Log.d("SmartWeekView", "onDraw Ended");
     }
 
     private void drawCurrentHourLine(Canvas canvas){

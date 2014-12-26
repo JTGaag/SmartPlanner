@@ -16,6 +16,7 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
@@ -377,6 +378,7 @@ public class WeekView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        Log.d("WeekView","onDraw started");
 
         // Draw the header row.
         drawHeaderRowAndEvents(canvas);
@@ -385,6 +387,7 @@ public class WeekView extends View {
         drawTimeColumnAndAxes(canvas);
 
         drawHideRect(canvas);
+        Log.d("WeekView","onDraw Ended");
         }
 
     protected void drawHideRect(Canvas canvas){

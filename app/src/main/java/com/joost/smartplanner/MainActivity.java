@@ -25,6 +25,7 @@ import java.util.List;
  * DONE: Get Events from database (20141226)
  * TODO: Research impact of parsing SmartEvent to WeekViewEvent in order to give to SmartWeekView-->WeekView onMonthChange()
  * TODO: delete event
+ * TODO: redraw when event is created
  */
 public class MainActivity extends ActionBarActivity implements SmartWeekView.MonthChangeListener, SmartWeekView.EventClickListener, SmartWeekView.EventLongPressListener, SmartWeekView.EmptyClickListener{
 
@@ -87,8 +88,28 @@ public class MainActivity extends ActionBarActivity implements SmartWeekView.Mon
     }
 
     @Override
-    public void onEventLongPress(WeekViewEvent weekViewEvent, RectF rectF) {
+    public void onEventLongPress(final WeekViewEvent weekViewEvent, RectF rectF) {
+        //PopUp
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Delete Event?");
+        alert.setMessage("Are you sure you want to delete " + weekViewEvent.getName() + "?");
 
+        alert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                db.deleteEvent(weekViewEvent.getId());
+                allSmartEvents = db.getAllEvents();
+                //Redraw with events refreshed
+                mSmartWeekView.notifyDatasetChanged();
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+            }
+        });
+
+        alert.show();
     }
 
     //comment
@@ -139,11 +160,11 @@ public class MainActivity extends ActionBarActivity implements SmartWeekView.Mon
                 SmartEvent newEvent = new SmartEvent(0,input.getText().toString(), startTime, endTime);
                 db.createSmartEvent(newEvent);
                 allSmartEvents = db.getAllEvents();
-                mSmartWeekView.invalidate();
-                //DebugCode
-                for(SmartEvent tmpEvent : allSmartEvents){
-                    Log.d("Event:", "Event: " + tmpEvent.getId() + " = " + tmpEvent.toJsonString());
-                }
+
+                //Redraw with events refreshed
+                mSmartWeekView.notifyDatasetChanged();
+
+
             }
         });
 
