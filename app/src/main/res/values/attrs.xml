@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- WeekView attr -->
     <declare-styleable name="WeekView">
         <attr name="firstDayOfWeek" format="enum">
             <enum name="sunday" value="1"/>
@@ -35,6 +36,7 @@
         <attr name="eventMarginVertical" format="dimension"/>
 
     </declare-styleable>
+    <!-- SmartWeekView extra attr -->
     <declare-styleable name="SmartWeekView">
         <attr name="hourFormat" format="enum">
             <enum name="twelve" value="1"/>
@@ -42,5 +44,21 @@
         </attr>
         <attr name="currentHourLineColor" format="color"/>
         <attr name="currentHourLineHeight" format="dimension"/>
+    </declare-styleable>
+
+    <!-- FAB -->
+    <attr name="floatingActionButtonStyle" format="reference"/>
+    <declare-styleable name="FloatingActionButton">
+        <!-- Background color -->
+        <attr name="floatingActionButtonColor" format="color|reference"/>
+        <!-- Size of action button -->
+        <attr name="floatingActionButtonSize" format="enum">
+            <!-- 56dp -->
+            <enum name="normal" value="0"/>
+            <!-- 40dp -->
+            <enum name="mini" value="1"/>
+        </attr>
+        <!-- Elevation will be configured for API level 21 according to this attribute. Default value is true. -->
+        <attr name="floatingActionButtonImplicitElevation" format="boolean"/>
     </declare-styleable>
 </resources>

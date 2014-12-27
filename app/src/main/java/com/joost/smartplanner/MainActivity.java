@@ -24,8 +24,10 @@ import java.util.List;
  * DONE: Add Event when longPressed (already impl in WeekView) (20141226)
  * DONE: Get Events from database (20141226)
  * TODO: Research impact of parsing SmartEvent to WeekViewEvent in order to give to SmartWeekView-->WeekView onMonthChange()
- * TODO: delete event
- * TODO: redraw when event is created
+ * DONE: delete event (20141226)
+ * DONE: redraw when event is created (20141226)
+ * TODO: Add Floating Action Button (FAB)
+ * TODO: Add "add event page" with animations (as in Calendar from google)
  */
 public class MainActivity extends ActionBarActivity implements SmartWeekView.MonthChangeListener, SmartWeekView.EventClickListener, SmartWeekView.EventLongPressListener, SmartWeekView.EmptyClickListener{
 
