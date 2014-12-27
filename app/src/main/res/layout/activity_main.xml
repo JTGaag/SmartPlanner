@@ -32,4 +32,17 @@
         app:currentHourLineHeight="2dp"
         app:hourFormat="twentyfour"/>
 
+    <com.joost.fab.FloatingActionButton
+        android:layout_width = "56dp"
+        android:layout_height = "56dp"
+        android:src = "@drawable/fab_add_drawable"
+        android:layout_alignParentBottom = "true"
+        android:layout_alignParentRight = "true"
+        android:layout_marginRight = "16dp"
+        android:layout_marginBottom = "16dp"
+        app:bg_color = "#FFF44336"
+        app:bg_color_pressed = "#FFD32F2F"
+        android:tint = "@android:color/white"/>
+
+
 </RelativeLayout>

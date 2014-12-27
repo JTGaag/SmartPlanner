@@ -35,6 +35,7 @@ public class MainActivity extends ActionBarActivity implements SmartWeekView.Mon
     private DatabaseHelper db;
     private List<SmartEvent> allSmartEvents = new ArrayList<SmartEvent>();
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +44,8 @@ public class MainActivity extends ActionBarActivity implements SmartWeekView.Mon
         //Construct DatabaseHelper
         db = new DatabaseHelper(getApplicationContext());
         allSmartEvents = new ArrayList<SmartEvent>(db.getAllEvents());
+
+
 
         // Get a reference for the week view in the layout.
         mSmartWeekView = (SmartWeekView) findViewById(R.id.weekView);

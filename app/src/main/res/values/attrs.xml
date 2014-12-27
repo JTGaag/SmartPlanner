@@ -46,19 +46,10 @@
         <attr name="currentHourLineHeight" format="dimension"/>
     </declare-styleable>
 
-    <!-- FAB -->
-    <attr name="floatingActionButtonStyle" format="reference"/>
+    <!-- FAB attrs-->
     <declare-styleable name="FloatingActionButton">
         <!-- Background color -->
-        <attr name="floatingActionButtonColor" format="color|reference"/>
-        <!-- Size of action button -->
-        <attr name="floatingActionButtonSize" format="enum">
-            <!-- 56dp -->
-            <enum name="normal" value="0"/>
-            <!-- 40dp -->
-            <enum name="mini" value="1"/>
-        </attr>
-        <!-- Elevation will be configured for API level 21 according to this attribute. Default value is true. -->
-        <attr name="floatingActionButtonImplicitElevation" format="boolean"/>
+        <attr name="bg_color" format="color"/>
+        <attr name="bg_color_pressed" format="color"/>
     </declare-styleable>
 </resources>
