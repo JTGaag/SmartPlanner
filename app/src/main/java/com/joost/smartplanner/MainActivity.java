@@ -28,6 +28,7 @@ import java.util.List;
  * DONE: redraw when event is created (20141226)
  * TODO: Add Floating Action Button (FAB)
  * TODO: Add "add event page" with animations (as in Calendar from google)
+ * TODO: Put everything in fragments so the interface is better and with possible smooth animations
  */
 public class MainActivity extends ActionBarActivity implements SmartWeekView.MonthChangeListener, SmartWeekView.EventClickListener, SmartWeekView.EventLongPressListener, SmartWeekView.EmptyClickListener{
 
