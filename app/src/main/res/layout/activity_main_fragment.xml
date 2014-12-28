@@ -1,0 +1,29 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
+    android:paddingBottom="0dp"
+    android:orientation = "vertical"
+    tools:context="com.joost.smartplanner.MainFragmentActivity">
+
+    <LinearLayout
+        android:id="@+id/toolBarFragmentContainer"
+        android:layout_width = "match_parent"
+        android:layout_height = "56dp"
+        android:background = "@android:color/holo_red_light"
+        android:orientation = "horizontal">
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/mainFragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight = "1"
+        android:background = "@color/grey_100"
+        android:gravity = "top"
+        android:orientation = "horizontal">
+
+    </LinearLayout>
+</LinearLayout>

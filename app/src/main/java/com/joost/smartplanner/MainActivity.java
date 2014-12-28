@@ -1,10 +1,10 @@
 package com.joost.smartplanner;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.RectF;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,14 +23,11 @@ import java.util.List;
  * DONE: Add database helper to mainActivity (20141226)
  * DONE: Add Event when longPressed (already impl in WeekView) (20141226)
  * DONE: Get Events from database (20141226)
- * TODO: Research impact of parsing SmartEvent to WeekViewEvent in order to give to SmartWeekView-->WeekView onMonthChange()
  * DONE: delete event (20141226)
  * DONE: redraw when event is created (20141226)
- * TODO: Add Floating Action Button (FAB)
- * TODO: Add "add event page" with animations (as in Calendar from google)
- * TODO: Put everything in fragments so the interface is better and with possible smooth animations
+ * Done: Add Floating Action Button (FAB) (20141227)
  */
-public class MainActivity extends ActionBarActivity implements SmartWeekView.MonthChangeListener, SmartWeekView.EventClickListener, SmartWeekView.EventLongPressListener, SmartWeekView.EmptyClickListener{
+public class MainActivity extends Activity implements SmartWeekView.MonthChangeListener, SmartWeekView.EventClickListener, SmartWeekView.EventLongPressListener, SmartWeekView.EmptyClickListener{
 
     private SmartWeekView mSmartWeekView;
     private DatabaseHelper db;
@@ -146,7 +143,6 @@ public class MainActivity extends ActionBarActivity implements SmartWeekView.Mon
     public void onEmptyClickCalendar(final Calendar tappedDay) {
         Log.d("Calendar Object", tappedDay.toString());
         //Create new SmartEvent with popup to ask name and randomize color
-        // TODO: Add nice popup to set Time and More for new SmartEvent etc.
         Boolean confirmed = false;
 
         //PopUp

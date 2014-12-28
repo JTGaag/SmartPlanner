@@ -5,4 +5,8 @@
     <color name = "fab_shader_dark_gray">#AA444444</color>
     <color name = "fab_shader_black">#66000000</color>
     <color name = "fab_shader_black_invis">#00FFFFFF</color>
+    <color name = "main_color_500">#FF00BCD4</color>
+    <color name = "main_color_700">#FF0097A7</color>
+    <color name = "main_color_100">#FFB2EBF2</color>
+    <color name = "grey_100">#FFF5F5F5</color>
 </resources>
