@@ -7,16 +7,22 @@
     android:orientation = "vertical"
     tools:context="com.joost.smartplanner.MainFragmentActivity">
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/toolBarFragmentContainer"
         android:layout_width = "match_parent"
         android:layout_height = "56dp"
         android:background = "@android:color/holo_red_light"
         android:orientation = "horizontal">
 
-    </LinearLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Slide"
+            android:id="@+id/button"
+            android:layout_gravity="right|center_vertical" />
+    </FrameLayout>
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/mainFragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -25,5 +31,5 @@
         android:gravity = "top"
         android:orientation = "horizontal">
 
-    </LinearLayout>
+    </FrameLayout>
 </LinearLayout>

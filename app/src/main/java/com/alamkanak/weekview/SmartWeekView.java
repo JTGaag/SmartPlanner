@@ -17,6 +17,7 @@ import java.util.Calendar;
  * TODO: Override all gestures in SmartWeekView (to get clean WeekView)
  * TODO: Draw view directly correct (date not half)
  * TODO: after event is created do not go to current time, but to created event start time
+ * TODO: when create view do not shift out of 24h
  */
 public class SmartWeekView extends WeekView {
 

@@ -78,7 +78,7 @@ public class FloatingActionButton extends ImageButton {
         sd1.setShaderFactory(new ShapeDrawable.ShaderFactory(){
             @Override
             public Shader resize(int width, int height) {
-                RadialGradient lg = new RadialGradient(width/2,height/2,(int)Math.round(width/2*1.3),
+                RadialGradient lg = new RadialGradient(width/2,height/2,(int)Math.round(width/2*1.0),
                         new int[]{
                                 getResources().getColor(R.color.fab_shader_white),
                                 getResources().getColor(R.color.fab_shader_gray),
@@ -97,9 +97,9 @@ public class FloatingActionButton extends ImageButton {
             }
         });
 
-        LayerDrawable ld = new LayerDrawable(new Drawable[]{ sd1, sd0});
-        ld.setLayerInset(0, 0, 5, 0, 0);
-        ld.setLayerInset(1, 0, 0, 5, 5);
+        LayerDrawable ld = new LayerDrawable(new Drawable[]{  sd0});
+        ld.setLayerInset(0, 0, 0, 0, 0);
+        //ld.setLayerInset(1, 0, 0, 5, 10);
 
         return ld;
     }
