@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.ViewTreeObserver;
 
 import com.joost.smartplanner.R;
 
@@ -17,7 +19,7 @@ import java.util.Calendar;
  * TODO: Override all gestures in SmartWeekView (to get clean WeekView)
  * TODO: Draw view directly correct (date not half)
  * TODO: after event is created do not go to current time, but to created event start time
- * TODO: when create view do not shift out of 24h
+ * TODO: when create view do not shift out of 24h (onPredraw)
  */
 public class SmartWeekView extends WeekView {
 
@@ -28,6 +30,9 @@ public class SmartWeekView extends WeekView {
     private int mCurrentTimeLineColor = Color.rgb(230, 0, 0);
     private int mCurrentTimeLineHeight = 2;
     private int mHourFormat = 2;
+
+    //PreDrawLister to draw correctly
+    private ViewTreeObserver.OnPreDrawListener preDrawListener = null;
 
     public enum HourFormat{
         TWELVE, TWENTYFOUR;
@@ -77,7 +82,8 @@ public class SmartWeekView extends WeekView {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
+        Log.d("SmartWeekView", "OnMeasure Called");
+        Log.d("SmartWeekView", "getHeight: " + getHeight());
         /**
          * Done: Get current time and verticaly scroll to the time (20141220)
          * Done: Set limit (not before 0:00 and after 24:00 [moved code to onMeasure method to gein axcess to getHeight()] (20141221)
@@ -85,7 +91,26 @@ public class SmartWeekView extends WeekView {
         Calendar rightNow = Calendar.getInstance();
         float currentHour = (float) rightNow.get(Calendar.HOUR_OF_DAY) + (rightNow.get(Calendar.MINUTE)/60.00f);
         getCurrentOrigin().y = -(getHourHeight())*(currentHour-1);
-        //Set limit
+
+        //For animation to not exceed time frame of 24h
+        if (preDrawListener == null) {
+            preDrawListener = new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    Log.d("onPreDraw", "getHeight: " + getHeight());
+                    getViewTreeObserver().removeOnPreDrawListener(preDrawListener);
+                    if (getCurrentOrigin().y > 0){
+                        getCurrentOrigin().y = 0;
+                    }else if (getCurrentOrigin().y  < -(getHourHeight() * 24 + getHeaderTextHeight() + getHeaderRowPadding() * 2 - getHeight())){
+                        getCurrentOrigin().y = -(getHourHeight() * 24 + getHeaderTextHeight() + getHeaderRowPadding() * 2 - getHeight());
+                    }
+                    return true;
+                }
+            };
+            getViewTreeObserver().addOnPreDrawListener(preDrawListener);
+        }
+
+        //Set limit (without animations)
         if (getCurrentOrigin().y > 0){
             getCurrentOrigin().y = 0;
         }else if (getCurrentOrigin().y  < -(getHourHeight() * 24 + getHeaderTextHeight() + getHeaderRowPadding() * 2 - getHeight())){
@@ -174,11 +199,6 @@ public class SmartWeekView extends WeekView {
     public void setCurrentTimeLineHeight(int mCurrentTimeLineHeight) {
         this.mCurrentTimeLineHeight = mCurrentTimeLineHeight;
     }
-
-
-
-
-
 
 
     @Override
