@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String LOG = "DatabaseHelper";
 
     // Database version
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     //Database name
     private static final String DATABASE_NAME = "smartPlannerDatabase";
@@ -51,6 +52,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public DatabaseHelper(Context context){
         //TODO: After testing save database in secure location (not on SDCard)
         super(context, "/mnt/sdcard/"+DATABASE_NAME, null, DATABASE_VERSION);
+        //super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
@@ -109,6 +111,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         endTime.setTimeInMillis(c.getLong(c.getColumnIndex(KEY_EVENT_ENDTIME)));
         SmartEvent smartEvent = new SmartEvent(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_EVENT_NAME)), startTime, endTime,c.getInt(c.getColumnIndex(KEY_EVENT_COLOR)));
 
+        db.close();
         return smartEvent;
     }
 
@@ -117,6 +120,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return Array list of SmartEvents
      */
     public List<SmartEvent> getAllEvents(){
+        Log.d("DatabaseHelper", "getAllevents Started");
         List<SmartEvent> events = new ArrayList<SmartEvent>();
         String selectQuery = "SELECT * FROM " + TABLE_EVENT;
 
@@ -131,11 +135,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 startTime.setTimeInMillis(c.getLong(c.getColumnIndex(KEY_EVENT_STARTTIME)));
                 endTime.setTimeInMillis(c.getLong(c.getColumnIndex(KEY_EVENT_ENDTIME)));
                 SmartEvent smartEvent = new SmartEvent(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_EVENT_NAME)), startTime, endTime, c.getInt(c.getColumnIndex(KEY_EVENT_COLOR)));
-                //Log.d("SmartEvent", smartEvent.toJsonString());
+                Log.d("SmartEvent", smartEvent.toJsonString());
                 events.add(smartEvent);
             }while(c.moveToNext());
         }
-
+        db.close();
         //Log.d("Event list", events.toString());
         return events;
     }
@@ -155,6 +159,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_EVENT_COLOR, sEvent.getColor()); //Color int can go in Integer
         values.put(KEY_CREATED_AT, getDateTime());
 
+        db.close();
         return db.update(TABLE_EVENT,values, KEY_ID + " = ?", new String[] {String.valueOf(sEvent.getId())});
     }
 
@@ -165,6 +170,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void deleteEvent(long event_id){
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_EVENT, KEY_ID + " = ?", new String[] { String.valueOf(event_id)});
+        db.close();
     }
 
     /**

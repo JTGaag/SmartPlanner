@@ -16,6 +16,7 @@
              which is used to tint widgets -->
         <item name="colorAccent">@color/main_accent_500</item>
 
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
     <style name="CustomToolbarStyle" parent="AppTheme.Base">

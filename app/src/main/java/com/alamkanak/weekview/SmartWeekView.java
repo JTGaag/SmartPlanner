@@ -17,9 +17,9 @@ import java.util.Calendar;
  * Created by Joost on 23/12/2014.
  * DONE: get all the added features in this class (20141224)
  * TODO: Override all gestures in SmartWeekView (to get clean WeekView)
- * TODO: Draw view directly correct (date not half)
+ * Done: Draw view directly correct (date not half)
  * TODO: after event is created do not go to current time, but to created event start time
- * TODO: when create view do not shift out of 24h (onPredraw)
+ * DONE: when create view do not shift out of 24h (onPredraw)
  */
 public class SmartWeekView extends WeekView {
 
@@ -126,16 +126,16 @@ public class SmartWeekView extends WeekView {
     @Override
     protected void onDraw(Canvas canvas) {
 
-        //Variables needed
-        int leftDaysWithGaps = (int) -(Math.ceil(getCurrentOrigin().x / (getWidthPerDay() + getColumnGap())));
-        float startPixel = getCurrentOrigin().x + (getWidthPerDay() + getColumnGap()) * leftDaysWithGaps + getHeaderColumnWidth();
-
         // Draw the header row.
         drawHeaderRowAndEvents(canvas);
 
         //Draw currentTimeLine
         drawCurrentHourLine(canvas);
 
+
+        //Variables needed for header and text
+        int leftDaysWithGaps = (int) -(Math.ceil(getCurrentOrigin().x / (getWidthPerDay() + getColumnGap())));
+        float startPixel = getCurrentOrigin().x + (getWidthPerDay() + getColumnGap()) * leftDaysWithGaps + getHeaderColumnWidth();
         //Draw header
         drawHeaderAndText(canvas, leftDaysWithGaps, startPixel);
 

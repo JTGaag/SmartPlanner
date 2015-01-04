@@ -1,4 +1,4 @@
-package com.joost.smartplanner;
+package com.joost.layout;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -13,6 +13,7 @@ import android.widget.EditText;
 
 import com.alamkanak.weekview.SmartWeekView;
 import com.alamkanak.weekview.WeekViewEvent;
+import com.joost.smartplanner.R;
 import com.joost.smartplanner.smartevent.DatabaseHelper;
 import com.joost.smartplanner.smartevent.SmartEvent;
 
@@ -24,6 +25,7 @@ import java.util.List;
  * Created by Joost on 27/12/2014.
  * DONE: port all smartWeekview actions to this fragment (20141228)
  * TODO: Research impact of parsing SmartEvent to WeekViewEvent in order to give to SmartWeekView-->WeekView onMonthChange()
+ * TODO: Investigate event draw when scrolling fast
  */
 public class CalendarFragment extends Fragment implements SmartWeekView.MonthChangeListener, SmartWeekView.EventClickListener, SmartWeekView.EventLongPressListener, SmartWeekView.EmptyClickListener{
 
@@ -73,7 +75,7 @@ public class CalendarFragment extends Fragment implements SmartWeekView.MonthCha
 
     @Override
     public void onEmptyClickCalendar(Calendar tappedDay) {
-        Log.d("Calendar Object", tappedDay.toString());
+        //Log.d("Calendar Object", tappedDay.toString());
         //Create new SmartEvent with popup to ask name and randomize color
         // TODO: Add nice popup to set Time and More for new SmartEvent etc.
         // TODO: check if final start and endtime are correct (quick fix)
@@ -148,18 +150,21 @@ public class CalendarFragment extends Fragment implements SmartWeekView.MonthCha
     @Override
     public List<WeekViewEvent> onMonthChange(int newYear, int newMonth) {
         // Populate the week view with some events.
-        List<WeekViewEvent> events = new ArrayList<WeekViewEvent>(getSmartEvents(newYear, newMonth));
+
+        List<WeekViewEvent> events = new ArrayList<WeekViewEvent>(getSmartEvents(newYear, newMonth-1));
         return events;
     }
 
     //Get events from database
     public List<WeekViewEvent> getSmartEvents(int newYear, int newMonth){
+        Log.d("CalendarFragment","Year: " + newYear + " Month: " + newMonth);
         List<WeekViewEvent> tmpList = new ArrayList<>();
 
         //Itterate over allSmartEvents
         for(SmartEvent tmpEvent : allSmartEvents){
+            Log.d("Eobtained events", "Year: "+tmpEvent.getStartTime().get(Calendar.YEAR) + " Month: " + tmpEvent.getStartTime().get(Calendar.MONTH));
             if(tmpEvent.getStartTime().get(Calendar.YEAR) == newYear && tmpEvent.getStartTime().get(Calendar.MONTH) == newMonth){
-                Log.d("Event:", "Event: " + tmpEvent.getId() + " = " + tmpEvent.toJsonString());
+                //Log.d("Event:", "Event: " + tmpEvent.getId() + " = " + tmpEvent.toJsonString());
                 tmpList.add((WeekViewEvent)tmpEvent);
             }
         }

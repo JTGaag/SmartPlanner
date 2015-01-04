@@ -2,6 +2,40 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.joost.smartplanner.MainFragmentActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id = "@+id/action_one"
+        android:title = "One"
+        android:orderInCategory="51"
+        app:showAsAction = "never"
+        />
+    <item
+        android:id = "@+id/action_two"
+        android:title = "Two"
+        android:orderInCategory="52"
+        app:showAsAction = "never"
+        />
+    <item
+        android:id = "@+id/action_three"
+        android:title = "Three"
+        android:orderInCategory="53"
+        app:showAsAction = "never"
+        />
+    <item
+        android:id = "@+id/action_four"
+        android:title = "Four"
+        android:orderInCategory="54"
+        app:showAsAction = "never"
+        />
+    <item
+        android:id="@+id/action_calendar"
+        android:title="Calendar"
+        android:order="50"
+        android:icon="@drawable/ic_insert_invitation_white_24dp"
+        app:showAsAction="always"/>
+
 </menu>

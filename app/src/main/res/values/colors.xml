@@ -8,5 +8,11 @@
     <color name = "main_color_500">#FF00BCD4</color>
     <color name = "main_color_700">#FF0097A7</color>
     <color name = "main_color_100">#FFB2EBF2</color>
+    <color name = "main_accent_500">#FF7D7C84</color>
+    <color name = "action_bar_color_500">#FF00BCD4</color>
+    <color name = "action_bar_color_700">#FF0097A7</color>
+    <color name = "action_bar_color_100">#FFB2EBF2</color>
     <color name = "grey_100">#FFF5F5F5</color>
+    <color name = "toolbar_white">#FFFFFFFF</color>
+    <color name = "drawer_white">#FFEEEEEE</color>
 </resources>

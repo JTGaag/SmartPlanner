@@ -295,10 +295,6 @@ public class WeekView extends View {
     }
 
 
-
-
-
-
     private void init() {
         // Get the date today.
         mToday = Calendar.getInstance();
@@ -527,6 +523,8 @@ public class WeekView extends View {
 
     protected void drawHeaderAndText(Canvas canvas, int leftDaysWithGaps, float startPixel){
         // Draw the header background.
+
+
         canvas.drawRect(0, 0, getWidth(), mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
 
         // Draw the header row texts.
