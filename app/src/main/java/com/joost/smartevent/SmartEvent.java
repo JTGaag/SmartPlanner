@@ -1,4 +1,4 @@
-package com.joost.smartplanner.smartevent;
+package com.joost.smartevent;
 
 import android.graphics.Color;
 

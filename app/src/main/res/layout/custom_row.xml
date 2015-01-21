@@ -10,7 +10,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:src="@drawable/ic_menu_black_24dp"/>
+        android:src="@drawable/ic_menu_black_24dp"
+        android:alpha="0.87"/>
 
     <TextView
         android:id="@+id/listText"
@@ -19,6 +20,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:text="Dummy Text"/>
+        android:textColor="@color/black"
+        android:text="Dummy Text"
+        android:alpha="0.87"/>
 
 </RelativeLayout>

@@ -1,4 +1,4 @@
-package com.joost.layout;
+package com.joost.navigationdrawer;
 
 /**
  * Created by Joost on 04/01/2015.
@@ -6,8 +6,16 @@ package com.joost.layout;
 public class DrawerItem {
     private int iconId;
     private String title;
+    private int viewType;
 
 
+    public int getViewType() {
+        return viewType;
+    }
+
+    public void setViewType(int viewType) {
+        this.viewType = viewType;
+    }
 
     public int getIconId() {
         return iconId;

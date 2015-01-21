@@ -15,4 +15,6 @@
     <color name = "grey_100">#FFF5F5F5</color>
     <color name = "toolbar_white">#FFFFFFFF</color>
     <color name = "drawer_white">#FFEEEEEE</color>
+    <color name = "divider">#1E000000</color>
+    <color name = "black">#FF000000</color>
 </resources>

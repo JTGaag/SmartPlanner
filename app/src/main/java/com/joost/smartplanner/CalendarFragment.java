@@ -1,4 +1,4 @@
-package com.joost.layout;
+package com.joost.smartplanner;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -13,9 +13,8 @@ import android.widget.EditText;
 
 import com.alamkanak.weekview.SmartWeekView;
 import com.alamkanak.weekview.WeekViewEvent;
-import com.joost.smartplanner.R;
-import com.joost.smartplanner.smartevent.DatabaseHelper;
-import com.joost.smartplanner.smartevent.SmartEvent;
+import com.joost.smartevent.DatabaseHelper;
+import com.joost.smartevent.SmartEvent;
 
 import java.util.ArrayList;
 import java.util.Calendar;

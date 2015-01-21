@@ -11,9 +11,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.joost.layout.CalendarFragment;
-import com.joost.layout.NavigationDrawerFragment;
-
 /**
  * Created by: Joost 2014-12-28
  * DONE: Create toolbar fragment (toolbar from compat 21+) (20150101)
@@ -53,7 +50,7 @@ public class MainFragmentActivity extends ActionBarActivity {
         //getFragmentManager().beginTransaction().add(R.id.mainFragmentContainer, new CalendarFragment(),CALENDAR_FRAGMENT_TAG).addToBackStack(null).commit();
 
         //Navigation fragment
-        NavigationDrawerFragment drawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
+        NavigationDrawerFragment drawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout)findViewById(R.id.drawer_layout), toolbar);
 
 

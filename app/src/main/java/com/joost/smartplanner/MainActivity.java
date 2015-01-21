@@ -12,8 +12,8 @@ import android.widget.EditText;
 
 import com.alamkanak.weekview.SmartWeekView;
 import com.alamkanak.weekview.WeekViewEvent;
-import com.joost.smartplanner.smartevent.DatabaseHelper;
-import com.joost.smartplanner.smartevent.SmartEvent;
+import com.joost.smartevent.DatabaseHelper;
+import com.joost.smartevent.SmartEvent;
 
 import java.util.ArrayList;
 import java.util.Calendar;

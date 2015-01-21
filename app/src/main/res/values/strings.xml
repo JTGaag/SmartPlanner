@@ -15,5 +15,6 @@
     <string name="action_example">Example action</string>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
+    <string name="create_event_default_title">Default Event Title</string>
 
 </resources>
