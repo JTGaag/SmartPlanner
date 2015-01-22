@@ -17,4 +17,5 @@
     <color name = "drawer_white">#FFEEEEEE</color>
     <color name = "divider">#1E000000</color>
     <color name = "black">#FF000000</color>
+    <color name = "colorHighlight">#FFB6B6B6</color>
 </resources>

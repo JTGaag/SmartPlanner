@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.joost.navigationdrawer.DrawerItem;
 import com.joost.navigationdrawer.DrawerItemAdapter;
+import com.joost.utilities.App;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  * Navigation drawer fragment as used in the SlideNerd youtube tutorials
  * TODO: Let fragments not overlap: remove previous fragment if a new one needs to be drawn
+ * TODO: on click of divider views not in count (make it better)
  */
 public class NavigationDrawerFragment extends Fragment {
 
@@ -48,6 +50,23 @@ public class NavigationDrawerFragment extends Fragment {
 
     final String CALENDAR_FRAGMENT_TAG = "calendar_fragment";
     final String CREATE_EVENT_FRAGMENT_TAG = "create_event_fragment";
+
+    //Menu Items
+    //DONE: put Strings in string file and not hardcoded (created App(aplication) to access resurces in static method (needed because MenuItems are requested through static method in order to us without this fragment being created))
+    static final MenuItem[] MENUITEMS = {   new MenuItem(R.drawable.ic_menu_black_24dp, App.getContext().getResources().getString(R.string.menu_calendar), 0, 1),   //item
+            new MenuItem(R.drawable.ic_menu_black_24dp,App.getContext().getResources().getString(R.string.menu_create_event), 0, 2),                                //item
+            new MenuItem(R.drawable.ic_menu_black_24dp,App.getContext().getResources().getString(R.string.menu_categories), 0, 3),                                  //item
+            new MenuItem(R.drawable.ic_menu_black_24dp,App.getContext().getResources().getString(R.string.menu_upcoming_tasks), 0, 4),                              //item
+            new MenuItem(R.drawable.ic_menu_black_24dp,App.getContext().getResources().getString(R.string.menu_divider), 1, 0),                                     //divider
+            new MenuItem(R.drawable.ic_menu_black_24dp,App.getContext().getResources().getString(R.string.menu_day_view), 0, 5),                                    //item
+            new MenuItem(R.drawable.ic_menu_black_24dp,App.getContext().getResources().getString(R.string.menu_week_view), 0, 6),                                   //item
+            new MenuItem(R.drawable.ic_menu_black_24dp,App.getContext().getResources().getString(R.string.menu_month_view), 0, 7),                                  //item
+            new MenuItem(R.drawable.ic_menu_black_24dp,App.getContext().getResources().getString(R.string.menu_divider), 1, 0),                                     //divider
+            new MenuItem(R.drawable.ic_settings_black_24dp,App.getContext().getResources().getString(R.string.menu_settings), 0, 98),                               //item
+            new MenuItem(R.drawable.ic_help_black_24dp,App.getContext().getResources().getString(R.string.menu_help), 0, 99)                                        //item
+    };
+
+
 
     public NavigationDrawerFragment() {
         // Required empty public constructor
@@ -76,29 +95,33 @@ public class NavigationDrawerFragment extends Fragment {
             //What to do with clicks on items go here
             @Override
             public void onClick(View view, int position) {
-                Toast.makeText(getActivity(), "onClick "+position, Toast.LENGTH_SHORT).show();
-                switch(position){
-                    case 0:
-                        getFragmentManager().beginTransaction()
-                                .setCustomAnimations(R.animator.slide_left,
-                                        R.animator.slide_right,
-                                        R.animator.slide_left,
-                                        R.animator.slide_right)
-                                .add(R.id.mainFragmentContainer, new CalendarFragment(),
-                                        CALENDAR_FRAGMENT_TAG
-                                ).addToBackStack(null).commit();
-                        mDrawerLayout.closeDrawers();
+                Toast.makeText(getActivity(), "onClick " + MENUITEMS[position].getClickAction(), Toast.LENGTH_SHORT).show();
+                switch(MENUITEMS[position].getClickAction()){
+                    case 0: //Divider is clickedIk
                         break;
                     case 1:
-                        getFragmentManager().beginTransaction()
-                                .setCustomAnimations(R.animator.slide_left,
-                                        R.animator.slide_right,
-                                        R.animator.slide_left,
-                                        R.animator.slide_right)
-                                .add(R.id.mainFragmentContainer, new CreateEventFragment(),
-                                        CREATE_EVENT_FRAGMENT_TAG
-                                ).addToBackStack(null).commit();
+//                        getFragmentManager().beginTransaction()
+//                                .setCustomAnimations(R.animator.slide_left,
+//                                        R.animator.slide_right,
+//                                        R.animator.slide_left,
+//                                        R.animator.slide_right)
+//                                .add(R.id.mainFragmentContainer, new CalendarFragment(),
+//                                        CALENDAR_FRAGMENT_TAG
+//                                ).addToBackStack(null).commit();
                         mDrawerLayout.closeDrawers();
+                        getFragmentManager().beginTransaction().add(R.id.mainFragmentContainer, new CalendarFragment(), CALENDAR_FRAGMENT_TAG).addToBackStack(null).commit();
+                        break;
+                    case 2:
+//                        getFragmentManager().beginTransaction()
+//                                .setCustomAnimations(R.animator.slide_left,
+//                                        R.animator.slide_right,
+//                                        R.animator.slide_left,
+//                                        R.animator.slide_right)
+//                                .add(R.id.mainFragmentContainer, new CreateEventFragment(),
+//                                        CREATE_EVENT_FRAGMENT_TAG
+//                                ).addToBackStack(null).commit();
+                        mDrawerLayout.closeDrawers();
+                        getFragmentManager().beginTransaction().add(R.id.mainFragmentContainer, new CreateEventFragment(), CREATE_EVENT_FRAGMENT_TAG).addToBackStack(null).commit();
                         break;
                     default:
 
@@ -108,7 +131,7 @@ public class NavigationDrawerFragment extends Fragment {
 
             @Override
             public void onLongClick(View view, int position) {
-                Toast.makeText(getActivity(), "onLongClick "+position, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "onLongClick "+ MENUITEMS[position].getClickAction(), Toast.LENGTH_SHORT).show();
             }
         }));
         return layout;
@@ -116,15 +139,11 @@ public class NavigationDrawerFragment extends Fragment {
 
     public static List<DrawerItem> getData(){
         List<DrawerItem> data = new ArrayList<>();
-        int[] icons = {R.drawable.ic_menu_black_24dp, R.drawable.ic_menu_black_24dp, R.drawable.ic_menu_black_24dp, R.drawable.ic_menu_black_24dp, 0, R.drawable.ic_settings_black_24dp, R.drawable.ic_help_black_24dp};
-        //TODO: put Strings in string file and not hardcoded
-        String[] titels = {"Title 1", "Title 2", "Title 3", "Title 4", "", "Settings", "Help"};
-        int[] viewTypes = {0, 0, 0, 0, 1, 0, 0};
-        for(int i=0; i<titels.length && i<icons.length && i<viewTypes.length; i++){
+        for(int i=0; i<MENUITEMS.length; i++){
             DrawerItem current = new DrawerItem();
-            current.setIconId(icons[i]);
-            current.setTitle(titels[i]);
-            current.setViewType(viewTypes[i]);
+            current.setIconId(MENUITEMS[i].getIcon());
+            current.setTitle(MENUITEMS[i].getTitle());
+            current.setViewType(MENUITEMS[i].getViewType());
             data.add(current);
         }
         return data;
@@ -231,5 +250,58 @@ public class NavigationDrawerFragment extends Fragment {
     public static interface ClickListener{
         public void onClick(View view, int position);
         public void onLongClick(View view, int position);
+    }
+
+    static class MenuItem{
+        int icon;
+        String title;
+        int viewType;
+        int clickAction;
+
+        /**
+         * MenuItem
+         * @param icon
+         * @param title
+         * @param viewType
+         * @param clickAction
+         */
+        MenuItem(int icon, String title, int viewType, int clickAction) {
+            this.icon = icon;
+            this.title = title;
+            this.viewType = viewType;
+            this.clickAction = clickAction;
+        }
+
+        public int getIcon() {
+            return icon;
+        }
+
+        public void setIcon(int icon) {
+            this.icon = icon;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public int getViewType() {
+            return viewType;
+        }
+
+        public void setViewType(int viewType) {
+            this.viewType = viewType;
+        }
+
+        public int getClickAction() {
+            return clickAction;
+        }
+
+        public void setClickAction(int clickAction) {
+            this.clickAction = clickAction;
+        }
     }
 }

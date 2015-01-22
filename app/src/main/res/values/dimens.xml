@@ -8,5 +8,8 @@
     <dimen name="nav_drawer_width">280dp</dimen>
     <dimen name="zerro_padding">0dp</dimen>
     <dimen name="zerro_margin">0dp</dimen>
+    <dimen name="navigation_drawer_top_padding">8dp</dimen>
+    <dimen name="navigation_drawer_first_item_height">56dp</dimen>
+    <dimen name="navigation_drawer_item_height">48dp</dimen>
 
 </resources>

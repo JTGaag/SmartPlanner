@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.joost.smartplanner.R;
+import com.joost.utilities.App;
 
 import java.util.Collections;
 import java.util.List;
@@ -56,6 +57,14 @@ public class DrawerItemAdapter extends RecyclerView.Adapter<DrawerItemAdapter.My
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         DrawerItem current = data.get(position);
+        if(position==0 && holder.viewType == 0){
+            holder.itemView.setMinimumHeight(App.getContext().getResources().getDimensionPixelSize(R.dimen.navigation_drawer_first_item_height));
+            holder.itemView.setPadding( App.getContext().getResources().getDimensionPixelSize(R.dimen.zerro_padding),
+                    App.getContext().getResources().getDimensionPixelSize(R.dimen.navigation_drawer_top_padding),
+                    App.getContext().getResources().getDimensionPixelSize(R.dimen.zerro_padding),
+                    App.getContext().getResources().getDimensionPixelSize(R.dimen.zerro_padding)
+            );
+        }
         switch(holder.viewType){
             case 0:
                 holder.title.setText(current.getTitle());
@@ -81,9 +90,11 @@ public class DrawerItemAdapter extends RecyclerView.Adapter<DrawerItemAdapter.My
         TextView title;
         ImageView icon;
         int viewType;
+        View itemView;
 
         public MyViewHolder(View itemView, int viewType) {
             super(itemView);
+            this.itemView = itemView;
             this.viewType = viewType;
             switch(viewType) {
                 case 0:
