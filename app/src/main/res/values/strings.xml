@@ -27,4 +27,15 @@
     <string name="menu_week_view">Week view</string>
     <string name="menu_month_view">Month view</string>
 
+    <string name="spinner_promp">Select Category</string>
+    <string name="save">Save</string>
+    <string-array name="spinner_array">
+        <item>Work</item>
+        <item>Study</item>
+        <item>Sleep</item>
+        <item>Free Time</item>
+        <item>Sport</item>
+        <item>Other</item>
+    </string-array>
+
 </resources>

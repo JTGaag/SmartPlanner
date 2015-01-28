@@ -30,7 +30,8 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  * Navigation drawer fragment as used in the SlideNerd youtube tutorials
  * TODO: Let fragments not overlap: remove previous fragment if a new one needs to be drawn
- * TODO: on click of divider views not in count (make it better)
+ * DONE: on click of divider views not in count (make it better)
+ * TODO: image as view in recycler view
  */
 public class NavigationDrawerFragment extends Fragment {
 

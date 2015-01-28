@@ -2,6 +2,7 @@ package com.joost.smartplanner;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -13,7 +14,8 @@ import android.widget.EditText;
 
 import com.alamkanak.weekview.SmartWeekView;
 import com.alamkanak.weekview.WeekViewEvent;
-import com.joost.smartevent.DatabaseHelper;
+import com.joost.fab.FloatingActionButton;
+import com.database.DatabaseHelper;
 import com.joost.smartevent.SmartEvent;
 
 import java.util.ArrayList;
@@ -25,19 +27,21 @@ import java.util.List;
  * DONE: port all smartWeekview actions to this fragment (20141228)
  * TODO: Research impact of parsing SmartEvent to WeekViewEvent in order to give to SmartWeekView-->WeekView onMonthChange()
  * TODO: Investigate event draw when scrolling fast
+ * DONE: put DatabaseHelper in Activity to be used by all fragments
  */
 public class CalendarFragment extends Fragment implements SmartWeekView.MonthChangeListener, SmartWeekView.EventClickListener, SmartWeekView.EventLongPressListener, SmartWeekView.EmptyClickListener{
 
-    //Variables for SmartWeekView to work (including databaseHnadler and storage for retreived events)
+    //Variables for SmartWeekView to work (including databaseHandler and storage for received events)
     private SmartWeekView mSmartWeekView;
     private DatabaseHelper db;
     private List<SmartEvent> allSmartEvents = new ArrayList<SmartEvent>();
+    private FloatingActionButton fab;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Construct DatabaseHelper
-        db = new DatabaseHelper(getActivity().getApplicationContext());
+        db = ((MainFragmentActivity)getActivity()).getDatabaseHelper();
         allSmartEvents = new ArrayList<SmartEvent>(db.getAllEvents());
     }
 
@@ -61,6 +65,17 @@ public class CalendarFragment extends Fragment implements SmartWeekView.MonthCha
 
         //Set emptyClickListener
         mSmartWeekView.setEmptyClickListener(this);
+
+        //Initiaze fab
+        fab = (FloatingActionButton)view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+                CreateEventDialogFragment frag = new CreateEventDialogFragment();
+                frag.show(ft, "FRAGMENT_TAG");
+            }
+        });
 
         //return the view
         return view;

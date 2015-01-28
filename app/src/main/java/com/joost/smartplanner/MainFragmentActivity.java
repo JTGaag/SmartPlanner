@@ -6,10 +6,13 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.database.DatabaseHelper;
 
 /**
  * Created by: Joost 2014-12-28
@@ -22,12 +25,16 @@ public class MainFragmentActivity extends ActionBarActivity {
 
     FragmentManager fragmentManager;
     private Toolbar toolbar;
+    private DatabaseHelper databaseHelper;
     final String CALENDAR_FRAGMENT_TAG = "calendar_fragment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_fragment_appbar);
+
+        //DatabaseHelper init
+        databaseHelper = new DatabaseHelper(this);
 
         fragmentManager = getFragmentManager();
 
@@ -45,6 +52,8 @@ public class MainFragmentActivity extends ActionBarActivity {
             }
         });
         toolbar.inflateMenu(R.menu.menu_main);
+        //debug
+        toolbarHeight();
 
         //Add calendar fragment at start of activity
         //getFragmentManager().beginTransaction().add(R.id.mainFragmentContainer, new CalendarFragment(),CALENDAR_FRAGMENT_TAG).addToBackStack(null).commit();
@@ -70,7 +79,7 @@ public class MainFragmentActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_calendar:
-                slideCalendar();
+                toolbarHeight();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -93,4 +102,22 @@ public class MainFragmentActivity extends ActionBarActivity {
                     ).addToBackStack(null).commit();
         }
     }
+
+    public void toolbarHeight(){
+        if(toolbar != null){
+            Log.d("Toolbar","Toolbar Height: "+toolbar.getHeight());
+        }else{
+            Log.d("Toolbar","Toolbar is null");
+        }
+
+    }
+
+    public Toolbar getToolbar(){
+        return toolbar;
+    }
+
+    public DatabaseHelper getDatabaseHelper() {
+        return databaseHelper;
+    }
+
 }

@@ -1,12 +1,249 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_100"
-    tools:context="com.joost.smartplanner.CreateEventFragment">
+    android:background="@color/fragment_bg_white"
+    android:focusable="true"
+    tools:context="com.joost.smartplanner.CreateEventFragment"
+    android:orientation="vertical"
+    android:padding="@dimen/zero_padding"
+    >
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/statusbar_height"
+        android:id="@+id/statusbar_bg"
+        android:background="@color/main_color_500"/>
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:text="@string/create_event_default_title" />
+    <include
+        layout="@layout/create_event_app_bar"
+        android:id="@+id/create_event_app_bar"
+        />
 
-</FrameLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/create_event_scrollview">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Event name part -->
+            <EditText
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:imeOptions="flagNoExtractUi"
+                android:hint="Event name"
+                android:textSize="@dimen/text_xlarge"
+                android:padding="8dp"
+                android:ems="8"
+                android:focusable="true"
+                android:clickable="true"
+                android:lines="1"
+                android:singleLine="true"
+                android:scrollHorizontally="false"
+                android:ellipsize="end"
+                android:id="@+id/editText" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Category part -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_category_outline_grey600_24dp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Category"
+                            android:textSize="@dimen/text_xlarge"
+                            android:layout_marginLeft="8dp"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp"
+                            android:layout_gravity="center_vertical|left"/>
+
+                        <Spinner
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|right"
+                            android:layout_marginRight="8dp"
+                            android:paddingRight="8dp"
+                            android:entries="@array/spinner_array"
+                            android:prompt="@string/spinner_promp">
+
+
+                        </Spinner>
+
+                    </FrameLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/divider"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- DateTime part -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_schedule_grey600_24dp"/>
+
+
+                        </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/create_event_start_datetime_container"
+                            android:orientation="horizontal"
+                            >
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/create_event_start_date_tv"
+                                android:text="Friday, Jan 23, 2015"
+                                android:textSize="@dimen/text_xlarge"
+                                android:layout_gravity="center_vertical|left"
+                                android:layout_marginLeft="8dp"
+                                android:paddingTop="8dp"
+                                android:paddingBottom="8dp"
+                                android:background="@drawable/custom_nav_item_bg"
+                                android:clickable="true"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/create_event_start_time_tv"
+                                android:text="11:00"
+                                android:textSize="@dimen/text_xlarge"
+                                android:layout_gravity="center_vertical|right"
+                                android:layout_marginRight="8dp"
+                                android:paddingTop="8dp"
+                                android:paddingBottom="8dp"
+                                android:background="@drawable/custom_nav_item_bg"
+                                android:clickable="true"/>
+
+                        </FrameLayout>
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/create_event_end_datetime_container"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/create_event_end_date_tv"
+                                android:text="Friday, Jan 23, 2015"
+                                android:textSize="@dimen/text_xlarge"
+                                android:layout_gravity="center_vertical|left"
+                                android:layout_marginLeft="8dp"
+                                android:paddingTop="8dp"
+                                android:paddingBottom="8dp"
+                                android:background="@drawable/custom_nav_item_bg"
+                                android:clickable="true"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/create_event_end_time_tv"
+                                android:text="12:00"
+                                android:textSize="@dimen/text_xlarge"
+                                android:layout_gravity="center_vertical|right"
+                                android:layout_marginRight="8dp"
+                                android:paddingTop="8dp"
+                                android:paddingBottom="8dp"
+                                android:background="@drawable/custom_nav_item_bg"
+                                android:clickable="true"/>
+
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/divider"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"/>
+
+                        </LinearLayout>
+
+
+
+                </LinearLayout>
+
+
+
+
+
+
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+
+
+
+</LinearLayout>

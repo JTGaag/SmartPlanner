@@ -316,7 +316,7 @@ public class WeekView extends View {
         mTimeTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         mTimeTextWidth = mTimeTextPaint.measureText("00 PM");
         mTimeTextHeight = rect.height();
-        mHeaderMarginBottom = mTimeTextHeight / 2;
+        mHeaderMarginBottom = -mTimeTextHeight / 2;
 
         // Measure settings for header row.
         mHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -324,7 +324,7 @@ public class WeekView extends View {
         mHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
         mHeaderTextPaint.setTextSize(mTextSize);
         mHeaderTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
-        mHeaderTextHeight = rect.height();
+        mHeaderTextHeight = rect.height()*2.4f; //TODO: get right of this quick fix
         mHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
 
         // Prepare header background paint.
@@ -390,8 +390,13 @@ public class WeekView extends View {
         // Hide everything in the first cell (top left corner).
         canvas.drawRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
 
+        //Lines
+        //By: Joost
+        canvas.drawLine(0, mHeaderTextHeight + mHeaderRowPadding * 2, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderTextHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+        canvas.drawLine(mTimeTextWidth + mHeaderColumnPadding * 2, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderTextHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+
         // Hide anything that is in the bottom margin of the header row.
-        canvas.drawRect(mHeaderColumnWidth, mHeaderTextHeight + mHeaderRowPadding * 2, getWidth(), mHeaderRowPadding * 2 + mHeaderTextHeight + mHeaderMarginBottom + mTimeTextHeight/2 - mHourSeparatorHeight / 2, mHeaderColumnBackgroundPaint);
+        //canvas.drawRect(mHeaderColumnWidth, mHeaderTextHeight + mHeaderRowPadding * 2, getWidth(), mHeaderRowPadding * 2 + mHeaderTextHeight + mHeaderMarginBottom + mTimeTextHeight/2 - mHourSeparatorHeight / 2, mHeaderColumnBackgroundPaint);
 
     }
 
@@ -405,8 +410,11 @@ public class WeekView extends View {
 
         // Draw the background color for the header column.
         canvas.drawRect(0, mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), mHeaderColumnBackgroundPaint);
+        //Lines
+        //By: Joost
+        canvas.drawLine(mHeaderColumnWidth, mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), mHourSeparatorPaint);
 
-        for (int i = 0; i < 24; i++) {
+        for (int i = 1; i < 24; i++) {
             float top = mHeaderTextHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * i + mHeaderMarginBottom;
 
             // Draw the text if its y position is not outside of the visible area. The pivot point of the text is the point at the bottom-right corner.
@@ -476,8 +484,13 @@ public class WeekView extends View {
 
             // Draw background color for each day.
             float start =  (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
-            if (mWidthPerDay + startPixel - start> 0)
-                canvas.drawRect(start, mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom, startPixel + mWidthPerDay, getHeight(), sameDay ? mTodayBackgroundPaint : mDayBackgroundPaint);
+            if (mWidthPerDay + startPixel - start> 0) {
+                canvas.drawRect(start, mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom, startPixel + mWidthPerDay, getHeight(), sameDay ? mTodayBackgroundPaint : mDayBackgroundPaint);
+            }
+
+            //Lines (vertical spliting colums)
+            //By: Joost
+            canvas.drawLine(startPixel + mWidthPerDay, mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom, startPixel + mWidthPerDay, getHeight(), mHourSeparatorPaint);
 
             // Prepare the separator lines for hours.
             int i = 0;
@@ -526,6 +539,9 @@ public class WeekView extends View {
 
 
         canvas.drawRect(0, 0, getWidth(), mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
+        //Lines (Single horizontal line splitting date header and calendar)
+        //By: Joost
+        canvas.drawLine(0, mHeaderTextHeight + mHeaderRowPadding * 2, getWidth(), mHeaderTextHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
 
         // Draw the header row texts.
         for (int dayNumber=leftDaysWithGaps+1; dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1; dayNumber++) {
@@ -535,8 +551,16 @@ public class WeekView extends View {
             boolean sameDay = isSameDay(day, mToday);
 
             // Draw the day labels.
-            String dayLabel = String.format("%s %d/%02d", getDayName(day), day.get(Calendar.MONTH) + 1, day.get(Calendar.DAY_OF_MONTH));
-            canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
+            //TODO: Custom date label
+            String dayLabel1 = String.format("%s", getDayName(day));
+            String dayLabel2 = String.format("%d/%02d", day.get(Calendar.MONTH) + 1, day.get(Calendar.DAY_OF_MONTH));
+            canvas.drawText(dayLabel1, startPixel + mWidthPerDay / 2, mHeaderTextHeight/2 + mHeaderRowPadding, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
+            canvas.drawText(dayLabel2, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
+
+            //Lines (Vertical lines between dates (columns))
+            //By: Joost
+            canvas.drawLine(startPixel + mWidthPerDay, 0, startPixel + mWidthPerDay, mHeaderTextHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+
             startPixel += mWidthPerDay + mColumnGap;
         }
     }

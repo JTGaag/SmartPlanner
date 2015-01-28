@@ -59,10 +59,10 @@ public class DrawerItemAdapter extends RecyclerView.Adapter<DrawerItemAdapter.My
         DrawerItem current = data.get(position);
         if(position==0 && holder.viewType == 0){
             holder.itemView.setMinimumHeight(App.getContext().getResources().getDimensionPixelSize(R.dimen.navigation_drawer_first_item_height));
-            holder.itemView.setPadding( App.getContext().getResources().getDimensionPixelSize(R.dimen.zerro_padding),
+            holder.itemView.setPadding( App.getContext().getResources().getDimensionPixelSize(R.dimen.zero_padding),
                     App.getContext().getResources().getDimensionPixelSize(R.dimen.navigation_drawer_top_padding),
-                    App.getContext().getResources().getDimensionPixelSize(R.dimen.zerro_padding),
-                    App.getContext().getResources().getDimensionPixelSize(R.dimen.zerro_padding)
+                    App.getContext().getResources().getDimensionPixelSize(R.dimen.zero_padding),
+                    App.getContext().getResources().getDimensionPixelSize(R.dimen.zero_padding)
             );
         }
         switch(holder.viewType){

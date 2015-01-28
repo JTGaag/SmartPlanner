@@ -22,4 +22,12 @@
         <item name="android:textColorSecondary">@color/toolbar_white</item>
     </style>
 
+    <style name="FullscreenDialogStyle" parent="AppTheme.Base">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:textColorPrimary">@color/toolbar_white</item>
+        <item name="android:textSize">@dimen/text_large</item>
+    </style>
+
 </resources>

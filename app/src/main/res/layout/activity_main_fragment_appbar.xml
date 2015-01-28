@@ -6,7 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/main_color_500">
+    android:background="@color/main_color_500"
+    >
+
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
@@ -16,16 +18,16 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingLeft="0dp"
-            android:paddingRight="0dp"
-            android:paddingTop="0dp"
-            android:paddingBottom="0dp"
+            android:padding="@dimen/zero_padding"
             android:orientation="vertical"
-            tools:context="com.joost.smartplanner.MainFragmentActivity">
+            tools:context="com.joost.smartplanner.MainFragmentActivity"
+            android:fitsSystemWindows="true">
 
             <include
+                layout="@layout/app_bar"
                 android:id="@+id/app_bar"
-                layout="@layout/app_bar" />
+                android:fitsSystemWindows="true"/>
+
 
             <FrameLayout
                 android:id="@+id/mainFragmentContainer"
@@ -33,9 +35,10 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:background="@color/grey_100"
-                android:padding="@dimen/zerro_padding"
+                android:padding="@dimen/zero_padding"
                 android:gravity="top"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:focusable="true">
 
             </FrameLayout>
         </LinearLayout>

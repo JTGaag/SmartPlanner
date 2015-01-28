@@ -18,4 +18,33 @@
     <color name = "divider">#1E000000</color>
     <color name = "black">#FF000000</color>
     <color name = "colorHighlight">#FFB6B6B6</color>
+    <color name = "fab_bg_color">#FFF44336</color>
+    <color name = "fab_bg_pressed_color">#FFD32F2F</color>
+    <color name="calendar_bg">#FFFFFFFF</color>
+    <color name="calendar_header_column_text_color">#9F000000</color>
+    <color name="calendar_day_background">#FFFFFFFF</color>
+    <color name="calendar_today_background">#66FAFAFA</color>
+    <color name="calendar_separator">#FFF0F0F0</color>
+    <color name="calendar_current_hour_line">#FFAA0000</color>
+    <color name="fragment_bg_white">#FFFFFFFF</color>
+
+    <color name="material_red">#FFF44336</color>
+    <color name="material_pink">#FFE91E63</color>
+    <color name="material_purple">#FF9C27B0</color>
+    <color name="material_deep_purple">#FF673AB7</color>
+    <color name="material_indigo">#FF3F51B5</color>
+    <color name="material_blue">#FF2196F3</color>
+    <color name="material_light_blue">#FF03A9F4</color>
+    <color name="material_cyan">#FF00BCD4</color>
+    <color name="material_teal">#FF009688</color>
+    <color name="material_green">#FF4CAF50</color>
+    <color name="material_light_green">#FF8BC34A</color>
+    <color name="material_lime">#FFCDDC39</color>
+    <color name="material_yellow">#FFFFEB3B</color>
+    <color name="material_amber">#FFFFC107</color>
+    <color name="material_orange">#FFFF9800</color>
+    <color name="material_deep_orange">#FFFF5722</color>
+    <color name="material_brown">#FF795548</color>
+    <color name="material_grey">#FF9E9E9E</color>
+    <color name="material_blue_grey">#FF607D8B</color>
 </resources>

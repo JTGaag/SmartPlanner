@@ -1,10 +1,11 @@
 package com.joost.smartplanner;
 
-
 import android.app.DatePickerDialog;
-import android.app.Fragment;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +13,11 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-
 /**
- * created by Joost
- * DONE: put create event in fullscreen dialog
+ * Created by Joost on 27/01/2015.
  */
-public class CreateEventFragment extends Fragment {
-
+public class CreateEventDialogFragment extends DialogFragment {
+    private Toolbar toolbar;
     private TextView startDate;
     private TextView startTime;
     private TextView endDate;
@@ -27,14 +26,36 @@ public class CreateEventFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.FullscreenDialogStyle);
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Dialog d = getDialog();
+        if(d!=null){
+            int width = ViewGroup.LayoutParams.MATCH_PARENT;
+            int height = ViewGroup.LayoutParams.MATCH_PARENT;
+            d.getWindow().setLayout(width, height);
+        }
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_create_event, container, false);
 
+        ///////////////////////
+        //Toolbar
+        //////////////////////
+        toolbar = (Toolbar) root.findViewById(R.id.create_event_app_bar);
+        toolbar.setNavigationIcon(R.drawable.ic_clear_white_24dp);
+        toolbar.setTitle("New Event");
+        toolbar.inflateMenu(R.menu.menu_create_event);
 
-        //Get textviews
+        /////////////////////////
+        //Get Input things
+        /////////////////////////
         startDate = (TextView) root.findViewById(R.id.create_event_start_date_tv);
         startTime = (TextView) root.findViewById(R.id.create_event_start_time_tv);
         endDate = (TextView) root.findViewById(R.id.create_event_end_date_tv);
@@ -98,9 +119,6 @@ public class CreateEventFragment extends Fragment {
         });
 
 
-
-
         return root;
     }
-
 }
