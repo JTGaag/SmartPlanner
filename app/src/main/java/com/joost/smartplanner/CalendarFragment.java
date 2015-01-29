@@ -15,7 +15,7 @@ import android.widget.EditText;
 import com.alamkanak.weekview.SmartWeekView;
 import com.alamkanak.weekview.WeekViewEvent;
 import com.joost.fab.FloatingActionButton;
-import com.database.DatabaseHelper;
+import com.joost.database.DatabaseHelper;
 import com.joost.smartevent.SmartEvent;
 
 import java.util.ArrayList;

@@ -12,7 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.database.DatabaseHelper;
+import com.joost.database.DatabaseHelper;
 
 /**
  * Created by: Joost 2014-12-28

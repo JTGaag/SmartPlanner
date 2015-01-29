@@ -1,4 +1,4 @@
-package com.database;
+package com.joost.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.joost.category.Category;
 import com.joost.smartevent.SmartEvent;
 
 import java.text.SimpleDateFormat;
@@ -20,6 +21,7 @@ import java.util.Locale;
 /**
  * Created by Joost on 23/12/2014.
  * DONE: Test DatabaseHelper (20141226)
+ * TODO: add categoty table
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -27,13 +29,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String LOG = "DatabaseHelper";
 
     // Database version
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     //Database name
     private static final String DATABASE_NAME = "smartPlannerDatabase";
 
     //Table names
     private static final String TABLE_EVENT = "events";
+    private static final String TABLE_CATEGORY = "categories";
 
     //Commen colum names
     private static final String KEY_ID = "_id";
@@ -46,10 +49,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_EVENT_ENDTIME = "event_end_time";
     private static final String KEY_EVENT_COLOR = "event_color";
 
-    //Create Tables
+    //CATEGORY table names
+    //private static final String KEY_EVENT_ID = "event_id";
+    private static final String KEY_CATEGORY_NAME = "name";
+    private static final String KEY_CATEGORY_PARENT_ID = "parent_id";
+    private static final String KEY_CATEGORY_LFT = "lft";
+    private static final String KEY_CATEGORY_RGT = "rgt";
+    private static final String KEY_CATEGORY_COLOR = "color";
+
+    //Create Tables commands
     private static final String CREATE_TABLE_EVENT = "CREATE TABLE "
             + TABLE_EVENT + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_EVENT_NAME + " TEXT," + KEY_EVENT_STARTTIME + " INTEGER,"
             + KEY_EVENT_ENDTIME + " INTEGER," + KEY_EVENT_COLOR + " INTEGER,"+ KEY_CREATED_AT + " DATETIME" + ")";
+
+    private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE "
+            + TABLE_CATEGORY + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_CATEGORY_NAME + " TEXT," + KEY_CATEGORY_PARENT_ID + " INTEGER,"
+            + KEY_CATEGORY_LFT + " INTEGER," + KEY_CATEGORY_RGT + " INTEGER," + KEY_CATEGORY_COLOR + " INTEGER," + KEY_CREATED_AT + " DATETIME" + ")";
 
     public DatabaseHelper(Context context){
         //TODO: After testing save database in secure location (not on SDCard)
@@ -61,18 +76,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         //Create database
         db.execSQL(CREATE_TABLE_EVENT);
+        db.execSQL(CREATE_TABLE_CATEGORY);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //Delete old database and recreate new one (run create method)
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENT);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
 
         onCreate(db);
     }
 
+
+    ///////////////////////////////////////////////////////////
+    //SMARTEVENT methods
+    //TODO: create method to save all smartevents in file in order to fill new database on database update
+    ///////////////////////////////////////////////////////////
     /**
-     * Create new entity in offline databse from SmartEvent
+     * Create new entity in offline database from SmartEvent
      * @param sEvent
      * @return
      */
@@ -87,7 +109,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_CREATED_AT, getDateTime());
 
         long event_id = db.insert(TABLE_EVENT, null, values);
-
+        db.close();
         return event_id;
     }
 
@@ -98,21 +120,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public SmartEvent getSmartEvent(long event_id){
         SQLiteDatabase db = this.getReadableDatabase();
-
         String selectQuery = "SELECT * FROM " + TABLE_EVENT + " WHERE " + KEY_ID + " = " + event_id;
-
         Cursor c = db.rawQuery(selectQuery, null);
+        SmartEvent smartEvent = null;
 
         if(c!=null){
             c.moveToFirst();
+            Calendar startTime = new GregorianCalendar();
+            Calendar endTime = new GregorianCalendar();
+            startTime.setTimeInMillis(c.getLong(c.getColumnIndex(KEY_EVENT_STARTTIME)));
+            endTime.setTimeInMillis(c.getLong(c.getColumnIndex(KEY_EVENT_ENDTIME)));
+            smartEvent = new SmartEvent(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_EVENT_NAME)), startTime, endTime,c.getInt(c.getColumnIndex(KEY_EVENT_COLOR)));
         }
-
-        Calendar startTime = new GregorianCalendar();
-        Calendar endTime = new GregorianCalendar();
-        startTime.setTimeInMillis(c.getLong(c.getColumnIndex(KEY_EVENT_STARTTIME)));
-        endTime.setTimeInMillis(c.getLong(c.getColumnIndex(KEY_EVENT_ENDTIME)));
-        SmartEvent smartEvent = new SmartEvent(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_EVENT_NAME)), startTime, endTime,c.getInt(c.getColumnIndex(KEY_EVENT_COLOR)));
-
         db.close();
         return smartEvent;
     }
@@ -161,8 +180,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_EVENT_COLOR, sEvent.getColor()); //Color int can go in Integer
         values.put(KEY_CREATED_AT, getDateTime());
 
+        int id = db.update(TABLE_EVENT, values, KEY_ID + " = ?", new String[]{String.valueOf(sEvent.getId())});
         db.close();
-        return db.update(TABLE_EVENT,values, KEY_ID + " = ?", new String[] {String.valueOf(sEvent.getId())});
+        return id;
     }
 
     /**
@@ -174,6 +194,106 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete(TABLE_EVENT, KEY_ID + " = ?", new String[] { String.valueOf(event_id)});
         db.close();
     }
+
+    ///////////////////////////////////////////////////////////
+    //CATEGORY methods
+    //TODO: create method to save all categories in file in order to fill new database on database update
+    ///////////////////////////////////////////////////////////
+
+    /**
+     * Create new entity in offline database from Category
+     * @param sCategory
+     * @return
+     */
+    public long createCategory(Category sCategory){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_CATEGORY_NAME, sCategory.getName()); //String can go in text
+        values.put(KEY_CATEGORY_PARENT_ID, sCategory.getParent_id());
+        values.put(KEY_CATEGORY_LFT, sCategory.getLft());
+        values.put(KEY_CATEGORY_RGT, sCategory.getRgt());
+        values.put(KEY_CATEGORY_COLOR, sCategory.getColor()); //Color int can go in Integer
+        values.put(KEY_CREATED_AT, getDateTime());
+
+        long category_id = db.insert(TABLE_CATEGORY, null, values);
+        db.close();
+        return category_id;
+    }
+
+    /**
+     * Return Category corresponding with the event_id
+     * @param category_id id of Category to retreived from database
+     * @return SmartEvent
+     */
+    public Category getCategory(long category_id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + TABLE_CATEGORY + " WHERE " + KEY_ID + " = " + category_id;
+        Cursor c = db.rawQuery(selectQuery, null);
+        Category category = null;
+
+        if(c!=null){
+            c.moveToFirst();
+            category = new Category(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_CATEGORY_NAME)), c.getLong(c.getColumnIndex(KEY_CATEGORY_PARENT_ID)), c.getLong(c.getColumnIndex(KEY_CATEGORY_LFT)), c.getLong(c.getColumnIndex(KEY_CATEGORY_RGT)), c.getInt(c.getColumnIndex(KEY_CATEGORY_COLOR)));
+        }
+
+        db.close();
+        return category;
+    }
+
+    /**
+     * Get all events stored in then offline database
+     * @return Array list of Categories
+     */
+    public List<Category> getAllCategories(){
+        Log.d("DatabaseHelper", "getAllCategories Started");
+        List<Category> categories = new ArrayList<Category>();
+        String selectQuery = "SELECT * FROM " + TABLE_CATEGORY;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if(c.moveToFirst()){
+            do{
+                Category category = new Category(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_CATEGORY_NAME)), c.getLong(c.getColumnIndex(KEY_CATEGORY_PARENT_ID)), c.getLong(c.getColumnIndex(KEY_CATEGORY_LFT)), c.getLong(c.getColumnIndex(KEY_CATEGORY_RGT)), c.getInt(c.getColumnIndex(KEY_CATEGORY_COLOR)));
+                categories.add(category);
+            }while(c.moveToNext());
+        }
+        db.close();
+        return categories;
+    }
+
+    /**
+     * Update Event Id of SmartEvent needs to be equal to Id in Database
+     * @param sCategory
+     * @return
+     */
+    public int updateCategory(Category sCategory){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_CATEGORY_NAME, sCategory.getName()); //String can go in text
+        values.put(KEY_CATEGORY_PARENT_ID, sCategory.getParent_id());
+        values.put(KEY_CATEGORY_LFT, sCategory.getLft());
+        values.put(KEY_CATEGORY_RGT, sCategory.getRgt());
+        values.put(KEY_CATEGORY_COLOR, sCategory.getColor()); //Color int can go in Integer
+        values.put(KEY_CREATED_AT, getDateTime());
+
+        int id = db.update(TABLE_CATEGORY,values, KEY_ID + " = ?", new String[] {String.valueOf(sCategory.getId())});
+        db.close();
+        return id;
+    }
+
+    /**
+     * Delete Categoty in offline database with the corresponding id
+     * @param category_id Id of category needed to be deleted
+     */
+    public void deleteCategory(long category_id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_CATEGORY, KEY_ID + " = ?", new String[] { String.valueOf(category_id)});
+        db.close();
+    }
+
 
     /**
      * get Date time in simple date time format
