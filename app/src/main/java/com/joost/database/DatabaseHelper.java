@@ -21,7 +21,7 @@ import java.util.Locale;
 /**
  * Created by Joost on 23/12/2014.
  * DONE: Test DatabaseHelper (20141226)
- * TODO: add categoty table
+ * DONE: add categoty table
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -197,8 +197,66 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     ///////////////////////////////////////////////////////////
     //CATEGORY methods
+    //TODO: receive all children from one parent category
+    //TODO: Method to automatically add lft and rgt to categories
+    //TODO: implement something to easy get the indentation
     //TODO: create method to save all categories in file in order to fill new database on database update
+    //TODO: get path to node TEST
+    //TODO: rebuild tree and TEST
     ///////////////////////////////////////////////////////////
+
+
+    public long rebuildCategoryTree(Category parent, long left){
+        long right = left + 1;
+        String childrenString = "SELECT * FROM "+TABLE_CATEGORY+" WHERE "+KEY_CATEGORY_PARENT_ID+" = "+parent.getId()+"";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(childrenString, null);
+        if(c!=null) {
+            if (c.moveToFirst()) {
+                do {
+                    Category category = new Category(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_CATEGORY_NAME)), c.getLong(c.getColumnIndex(KEY_CATEGORY_PARENT_ID)), c.getLong(c.getColumnIndex(KEY_CATEGORY_LFT)), c.getLong(c.getColumnIndex(KEY_CATEGORY_RGT)), c.getInt(c.getColumnIndex(KEY_CATEGORY_COLOR)));
+                    right = rebuildCategoryTree(category, right);
+                } while (c.moveToNext());
+            }
+        }
+        db.close();
+
+        //verder maken
+        db = this.getReadableDatabase();
+
+        //update database entry
+        ContentValues values = new ContentValues();
+        values.put(KEY_CATEGORY_LFT, left);
+        values.put(KEY_CATEGORY_RGT, right);
+        int id = db.update(TABLE_CATEGORY,values, KEY_ID + " = ?", new String[] {String.valueOf(parent.getId())});
+        db.close();
+
+        return right + 1;
+    }
+
+
+    /**
+     *
+     * @param node to get path from
+     * @return
+     */
+    public List<Category> getPathToNode(Category node){
+        List<Category> categories = new ArrayList<Category>();
+        String selectQuery = "SELECT * FROM "+TABLE_CATEGORY+" WHERE "+KEY_CATEGORY_LFT+" < "+node.getLft()+" AND "+KEY_CATEGORY_RGT+" > "+node.getRgt()+" ORDER BY "+KEY_CATEGORY_LFT+" ASC";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if(c.moveToFirst()){
+            do{
+                Category category = new Category(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_CATEGORY_NAME)), c.getLong(c.getColumnIndex(KEY_CATEGORY_PARENT_ID)), c.getLong(c.getColumnIndex(KEY_CATEGORY_LFT)), c.getLong(c.getColumnIndex(KEY_CATEGORY_RGT)), c.getInt(c.getColumnIndex(KEY_CATEGORY_COLOR)));
+                categories.add(category);
+            }while(c.moveToNext());
+        }
+        db.close();
+
+        return categories;
+    }
 
     /**
      * Create new entity in offline database from Category
@@ -236,8 +294,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             c.moveToFirst();
             category = new Category(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_CATEGORY_NAME)), c.getLong(c.getColumnIndex(KEY_CATEGORY_PARENT_ID)), c.getLong(c.getColumnIndex(KEY_CATEGORY_LFT)), c.getLong(c.getColumnIndex(KEY_CATEGORY_RGT)), c.getInt(c.getColumnIndex(KEY_CATEGORY_COLOR)));
         }
-
         db.close();
+
         return category;
     }
 
