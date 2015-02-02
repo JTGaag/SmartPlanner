@@ -6,27 +6,58 @@ import android.app.DialogFragment;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+
+import com.joost.category.Category;
+import com.joost.database.DatabaseHelper;
+import com.joost.layout.CategorySpinnerAdapter;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Joost on 27/01/2015.
  */
 public class CreateEventDialogFragment extends DialogFragment {
+
     private Toolbar toolbar;
+    private Spinner categorySpinner;
     private TextView startDate;
     private TextView startTime;
     private TextView endDate;
     private TextView endTime;
+    private Boolean endTimeSet = false;
+    private Boolean startTimeSet = false;
+    private Boolean endDateSet = false;
+    private Boolean startDateSet = false;
+    private GregorianCalendar startDateTime = new GregorianCalendar(Locale.getDefault());
+    private GregorianCalendar endDateTime = new GregorianCalendar(Locale.getDefault());
+    SimpleDateFormat simpleTimeFormat = new SimpleDateFormat("H:mm");
+    private final int DEFAULT_EVENT_TIME = 1;
+    private DatabaseHelper dbH;
+    private List<Category> allCategories;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NORMAL, R.style.FullscreenDialogStyle);
+
+        dbH = ((MainFragmentActivity)getActivity()).getDatabaseHelper();
+        getAllCategories();
+        endDateTime.add(Calendar.HOUR_OF_DAY, DEFAULT_EVENT_TIME);
     }
 
     @Override
@@ -56,12 +87,24 @@ public class CreateEventDialogFragment extends DialogFragment {
         /////////////////////////
         //Get Input things
         /////////////////////////
+        categorySpinner = (Spinner) root.findViewById(R.id.category_spinner);
         startDate = (TextView) root.findViewById(R.id.create_event_start_date_tv);
         startTime = (TextView) root.findViewById(R.id.create_event_start_time_tv);
         endDate = (TextView) root.findViewById(R.id.create_event_end_date_tv);
         endTime = (TextView) root.findViewById(R.id.create_event_end_time_tv);
 
+        startDate.setText(startDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(startDateTime.getTime()));
+        endDate.setText(endDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(endDateTime.getTime()));
+        startTime.setText(simpleTimeFormat.format(startDateTime.getTime()));
+        endTime.setText(simpleTimeFormat.format(endDateTime.getTime()));
+
+        //Set spinners
+        CategorySpinnerAdapter categorySpinnerAdapter = new CategorySpinnerAdapter(getActivity(), R.layout.custom_spinner_item, allCategories);
+        categorySpinner.setAdapter(categorySpinnerAdapter);
+
         //set onclicklistners
+        //TODO: set date and time to current time, or selected dateTime if so selected
+        //TODO: make it so that startDateTime is always before endDateTime
         startDate.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -69,9 +112,33 @@ public class CreateEventDialogFragment extends DialogFragment {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                        startDate.setText(day + "/" + month + "/" + year);
+                        startDateTime.set(year, month, day);
+
+                        startDate.setText(startDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(startDateTime.getTime()));
+                        //startDate set
+                        startDateSet = true;
+
+                        //set endDate to the startDate if endDate is not yet set
+                        if(!endDateSet){
+
+                            //Add one hour to set startDateTime
+                            int hourDif = endDateTime.get(Calendar.HOUR_OF_DAY) - startDateTime.get(Calendar.HOUR_OF_DAY);
+                            if(hourDif<0){hourDif = hourDif+24;}
+                            int minuteDif = endDateTime.get(Calendar.MINUTE) - startDateTime.get(Calendar.MINUTE);
+                            Log.d("Difference","HourDif: "+hourDif+" minuteDif: "+minuteDif);
+
+                            endDateTime = (GregorianCalendar)startDateTime.clone();
+                            endDateTime.add(Calendar.HOUR_OF_DAY, hourDif);
+                            endDateTime.add(Calendar.MINUTE, minuteDif);
+
+                            Log.d("New dates","start: "+startDateTime.toString());
+                            Log.d("New dates","  end: "+endDateTime.toString());
+                            //Set time and Date fields
+                            endTime.setText(simpleTimeFormat.format(endDateTime.getTime()));
+                            endDate.setText(endDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(endDateTime.getTime()));
+                        }
                     }
-                }, 2015, 01, 27);
+                }, startDateTime.get(Calendar.YEAR), startDateTime.get(Calendar.MONTH), startDateTime.get(Calendar.DAY_OF_MONTH));
                 datePickerDialog.show();
             }
         });
@@ -83,9 +150,24 @@ public class CreateEventDialogFragment extends DialogFragment {
                 TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                        startTime.setText(hour + ":" + minute);
+                        startDateTime.set(Calendar.HOUR_OF_DAY, hour);
+                        startDateTime.set(Calendar.MINUTE, minute);
+
+                        startTime.setText(simpleTimeFormat.format(startDateTime.getTime()));
+                        //startime set
+                        startTimeSet = true;
+                        //Same as date
+                        if(!endTimeSet){
+                            endDateTime.set(Calendar.HOUR_OF_DAY, hour);
+                            endDateTime.add(Calendar.HOUR_OF_DAY, DEFAULT_EVENT_TIME);
+                            endDateTime.set(Calendar.MINUTE, minute);
+
+                            //Set time and Date fields
+                            endTime.setText(simpleTimeFormat.format(endDateTime.getTime()));
+                            endDate.setText(endDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(endDateTime.getTime()));
+                        }
                     }
-                }, 12,15, true);
+                }, startDateTime.get(Calendar.HOUR_OF_DAY),startDateTime.get(Calendar.MINUTE), true);
                 timePickerDialog.show();
             }
         });
@@ -97,9 +179,26 @@ public class CreateEventDialogFragment extends DialogFragment {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                        endDate.setText(day + "/" + month + "/" + year);
+                        endDateTime.set(year, month, day);
+
+                        endDate.setText(endDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(endDateTime.getTime()));
+
+                        endDateSet = true;
+
+                        if(!startDateSet){
+                            int hourDif = endDateTime.get(Calendar.HOUR_OF_DAY) - startDateTime.get(Calendar.HOUR_OF_DAY);
+                            if(hourDif<0){hourDif = hourDif+24;}
+                            int minuteDif = endDateTime.get(Calendar.MINUTE) - startDateTime.get(Calendar.MINUTE);
+                            startDateTime = (GregorianCalendar) endDateTime.clone();
+                            startDateTime.add(Calendar.HOUR_OF_DAY, -hourDif);
+                            startDateTime.add(Calendar.MINUTE, -minuteDif);
+
+                            //Set time and Date fields
+                            startTime.setText(simpleTimeFormat.format(startDateTime.getTime()));
+                            startDate.setText(startDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(startDateTime.getTime()));
+                        }
                     }
-                }, 2015, 01, 27);
+                }, endDateTime.get(Calendar.YEAR), endDateTime.get(Calendar.MONTH), endDateTime.get(Calendar.DAY_OF_MONTH));
                 datePickerDialog.show();
             }
         });
@@ -111,14 +210,32 @@ public class CreateEventDialogFragment extends DialogFragment {
                 TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                        endTime.setText(hour + ":" + minute);
+                        endDateTime.set(Calendar.HOUR_OF_DAY, hour);
+                        endDateTime.set(Calendar.MINUTE, minute);
+
+                        endTime.setText(simpleTimeFormat.format(endDateTime.getTime()));
+                        endTimeSet = true;
+
+                        if(!startTimeSet){
+                            startDateTime.set(Calendar.HOUR_OF_DAY, hour);
+                            startDateTime.add(Calendar.HOUR_OF_DAY, -DEFAULT_EVENT_TIME);
+                            startDateTime.set(Calendar.MINUTE, minute);
+
+                            //Set time and Date fields
+                            startTime.setText(simpleTimeFormat.format(startDateTime.getTime()));
+                            startDate.setText(startDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(startDateTime.getTime()));
+                        }
                     }
-                }, 12,15, true);
+                }, endDateTime.get(Calendar.HOUR_OF_DAY), endDateTime.get(Calendar.MINUTE), true);
                 timePickerDialog.show();
             }
         });
 
 
         return root;
+    }
+
+    private void getAllCategories() {
+        allCategories = dbH.getAllCategories();
     }
 }

@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -22,6 +21,7 @@ import android.widget.TextView;
 import com.joost.category.Category;
 import com.joost.database.DatabaseHelper;
 import com.joost.layout.CategoryListViewAdapter;
+import com.joost.layout.CategorySpinnerAdapter;
 import com.joost.layout.ColorAdapter;
 import com.joost.layout.SpinnerItemColor;
 
@@ -83,6 +83,13 @@ public class CategoryFragment extends Fragment {
                 //TODO: do something with OnItemClickListener
             }
         });
+        categoryListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //TODO: do something with long click
+                return false;
+            }
+        });
 
         displayCategories();
 
@@ -120,22 +127,13 @@ public class CategoryFragment extends Fragment {
         final Spinner parentSpinner = (Spinner) promptsView.findViewById(R.id.parentSpinner);
         final Spinner colorSpinner = (Spinner) promptsView.findViewById(R.id.colorSpinner);
 
-        //fill spinner with up-to-date categories
+
         getAllCategories();
-        String name_array[] = new String[allCategories.size()];
-        for (int i = 0; i < allCategories.size(); i++) {
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int j = 0; j < allCategories.get(i).getLayer(); j++) {
-                stringBuilder.append("      ");
-            }
-            stringBuilder.append(allCategories.get(i).getName());
-            name_array[i] = stringBuilder.toString();
-        }
-        ArrayAdapter adapter = new ArrayAdapter(getActivity(), R.layout.custom_spinner_item, name_array);
-        parentSpinner.setAdapter(adapter);
 
-
-
+        //fill spinner with up-to-date categories
+        CategorySpinnerAdapter categorySpinnerAdapter = new CategorySpinnerAdapter(getActivity(), R.layout.custom_spinner_item, allCategories);
+        parentSpinner.setAdapter(categorySpinnerAdapter);
+        //Fill color spinner
         ColorAdapter colorAdapter = new ColorAdapter(getActivity(), android.R.layout.simple_spinner_item, colors);
         colorSpinner.setAdapter(colorAdapter);
 

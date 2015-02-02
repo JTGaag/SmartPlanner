@@ -85,33 +85,33 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <FrameLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Category"
+                            android:text="Category:"
                             android:textSize="@dimen/text_xlarge"
                             android:layout_marginLeft="8dp"
                             android:paddingTop="8dp"
                             android:paddingBottom="8dp"
+                            android:paddingRight="8dp"
                             android:layout_gravity="center_vertical|left"/>
 
                         <Spinner
-                            android:layout_width="wrap_content"
+                            android:id="@+id/category_spinner"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|right"
+                            android:gravity="right|center_vertical"
                             android:layout_marginRight="8dp"
                             android:paddingRight="8dp"
-                            android:entries="@array/spinner_array"
-                            android:prompt="@string/spinner_promp">
+                            android:prompt="@string/spinner_promp"/>
 
 
-                        </Spinner>
-
-                    </FrameLayout>
+                    </LinearLayout>
 
 
                     <LinearLayout
