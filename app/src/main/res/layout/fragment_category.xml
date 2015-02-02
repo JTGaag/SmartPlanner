@@ -1,5 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -18,10 +19,32 @@
         android:text="Rebuild Tree"
         android:id="@+id/bt_rebuild_tree" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="0dp" />
+
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="320dp"
+        android:id="@+id/categoryListView" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="8dp" />
+
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:text="Category Tree"
-        android:id="@+id/tv_category_tree"/>
+        android:id="@+id/tv_category_tree" />
+
 
 </LinearLayout>

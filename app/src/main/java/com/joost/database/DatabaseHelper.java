@@ -9,6 +9,8 @@ import android.util.Log;
 
 import com.joost.category.Category;
 import com.joost.smartevent.SmartEvent;
+import com.joost.smartplanner.R;
+import com.joost.utilities.App;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String LOG = "DatabaseHelper";
 
     // Database version
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 2;
 
     //Database name
     private static final String DATABASE_NAME = "smartPlannerDatabase";
@@ -55,7 +57,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_CATEGORY_PARENT_ID = "parent_id";
     private static final String KEY_CATEGORY_LFT = "lft";
     private static final String KEY_CATEGORY_RGT = "rgt";
+    private static final String KEY_CATEGORY_LAYER = "layer";
     private static final String KEY_CATEGORY_COLOR = "color";
+
+    //Readable and writable database
+    SQLiteDatabase database;
 
     //Create Tables commands
     private static final String CREATE_TABLE_EVENT = "CREATE TABLE "
@@ -64,12 +70,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE "
             + TABLE_CATEGORY + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_CATEGORY_NAME + " TEXT," + KEY_CATEGORY_PARENT_ID + " INTEGER,"
-            + KEY_CATEGORY_LFT + " INTEGER," + KEY_CATEGORY_RGT + " INTEGER," + KEY_CATEGORY_COLOR + " INTEGER," + KEY_CREATED_AT + " DATETIME" + ")";
+            + KEY_CATEGORY_LFT + " INTEGER," + KEY_CATEGORY_RGT + " INTEGER," + KEY_CATEGORY_LAYER + " INTEGER," + KEY_CATEGORY_COLOR + " INTEGER," + KEY_CREATED_AT + " DATETIME" + ")";
 
     public DatabaseHelper(Context context){
         //TODO: After testing save database in secure location (not on SDCard)
         super(context, "/mnt/sdcard/"+DATABASE_NAME, null, DATABASE_VERSION);
         //super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+        database = this.getWritableDatabase();
     }
 
     @Override
@@ -77,6 +85,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //Create database
         db.execSQL(CREATE_TABLE_EVENT);
         db.execSQL(CREATE_TABLE_CATEGORY);
+        //Make first Category entry
+        //TODO: load from file else make this
+        Log.d("DATABASE", "added first category");
+        createCategory(new Category(0,"Categories",-1,1,2,0, App.getContext().getResources().getColor(R.color.material_red)),db); //-1 as parent_id to indicate that there is no parent
     }
 
     @Override
@@ -198,38 +210,47 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     ///////////////////////////////////////////////////////////
     //CATEGORY methods
     //TODO: receive all children from one parent category
-    //TODO: Method to automatically add lft and rgt to categories
+    //TODO: Method to automatically add lft and rgt to categories (create based)
     //TODO: implement something to easy get the indentation
     //TODO: create method to save all categories in file in order to fill new database on database update
     //TODO: get path to node TEST
-    //TODO: rebuild tree and TEST
+    //DONE: rebuild tree and TEST
+    //DONE: get tree from specific parent (parent and all children)
     ///////////////////////////////////////////////////////////
 
 
-    public long rebuildCategoryTree(Category parent, long left){
+    public boolean rebuildCategoryTree(Category parent, long left) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        //First time method is called for highes parent in most cases
+        rebuildCategory(parent, left, db);
+        db.close();
+        return true;
+    }
+
+    /**
+     * Kan niet goed werken met reqursive dingen!
+     * @param parent
+     * @param left
+     * @return
+     */
+    public long rebuildCategory(Category parent, long left, SQLiteDatabase db){
         long right = left + 1;
         String childrenString = "SELECT * FROM "+TABLE_CATEGORY+" WHERE "+KEY_CATEGORY_PARENT_ID+" = "+parent.getId()+"";
-        SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(childrenString, null);
         if(c!=null) {
             if (c.moveToFirst()) {
                 do {
                     Category category = new Category(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_CATEGORY_NAME)), c.getLong(c.getColumnIndex(KEY_CATEGORY_PARENT_ID)), c.getLong(c.getColumnIndex(KEY_CATEGORY_LFT)), c.getLong(c.getColumnIndex(KEY_CATEGORY_RGT)), c.getInt(c.getColumnIndex(KEY_CATEGORY_COLOR)));
-                    right = rebuildCategoryTree(category, right);
+                    right = rebuildCategory(category, right, db);
                 } while (c.moveToNext());
             }
         }
-        db.close();
-
-        //verder maken
-        db = this.getReadableDatabase();
 
         //update database entry
         ContentValues values = new ContentValues();
         values.put(KEY_CATEGORY_LFT, left);
         values.put(KEY_CATEGORY_RGT, right);
         int id = db.update(TABLE_CATEGORY,values, KEY_ID + " = ?", new String[] {String.valueOf(parent.getId())});
-        db.close();
 
         return right + 1;
     }
@@ -249,7 +270,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if(c.moveToFirst()){
             do{
-                Category category = new Category(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_CATEGORY_NAME)), c.getLong(c.getColumnIndex(KEY_CATEGORY_PARENT_ID)), c.getLong(c.getColumnIndex(KEY_CATEGORY_LFT)), c.getLong(c.getColumnIndex(KEY_CATEGORY_RGT)), c.getInt(c.getColumnIndex(KEY_CATEGORY_COLOR)));
+                Category category = new Category(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_CATEGORY_NAME)), c.getLong(c.getColumnIndex(KEY_CATEGORY_PARENT_ID)), c.getLong(c.getColumnIndex(KEY_CATEGORY_LFT)), c.getLong(c.getColumnIndex(KEY_CATEGORY_RGT)), c.getInt(c.getColumnIndex(KEY_CATEGORY_LAYER)), c.getInt(c.getColumnIndex(KEY_CATEGORY_COLOR)));
                 categories.add(category);
             }while(c.moveToNext());
         }
@@ -265,17 +286,55 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public long createCategory(Category sCategory){
         SQLiteDatabase db = this.getWritableDatabase();
+        int tmpLayer = -1;
+        long tmpRight = 99999;
+
+        String selectQuery = "SELECT * FROM " + TABLE_CATEGORY + " WHERE " + KEY_ID + " = " + sCategory.getParent_id();
+        Cursor c = db.rawQuery(selectQuery, null);
+        if(c.moveToFirst()){
+            tmpLayer = c.getInt(c.getColumnIndex(KEY_CATEGORY_LAYER)) + 1;
+            tmpRight = c.getLong(c.getColumnIndex(KEY_CATEGORY_RGT));
+        }
+
+        String lftQuery = "UPDATE "+TABLE_CATEGORY+" SET "+KEY_CATEGORY_LFT+"="+KEY_CATEGORY_LFT+"+2 WHERE "+KEY_CATEGORY_LFT+">="+tmpRight;
+        String rgtQuery = "UPDATE "+TABLE_CATEGORY+" SET "+KEY_CATEGORY_RGT+"="+KEY_CATEGORY_RGT+"+2 WHERE "+KEY_CATEGORY_RGT+">="+tmpRight;
+
+        db.execSQL(lftQuery);
+        db.execSQL(rgtQuery);
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_CATEGORY_NAME, sCategory.getName()); //String can go in text
+        values.put(KEY_CATEGORY_PARENT_ID, sCategory.getParent_id());
+        values.put(KEY_CATEGORY_LFT, tmpRight);
+        values.put(KEY_CATEGORY_RGT, tmpRight+1);
+        values.put(KEY_CATEGORY_LAYER, tmpLayer);
+        values.put(KEY_CATEGORY_COLOR, sCategory.getColor()); //Color int can go in Integer
+        values.put(KEY_CREATED_AT, getDateTime());
+
+        long category_id = db.insert(TABLE_CATEGORY, null, values);
+        db.close();
+        Log.d("CREATED Category", "Category id: "+category_id);
+        return category_id;
+    }
+
+    /**
+     * Create new entity in offline database from Category using inserted db
+     * @param sCategory
+     * @return
+     */
+    public long createCategory(Category sCategory, SQLiteDatabase db){
 
         ContentValues values = new ContentValues();
         values.put(KEY_CATEGORY_NAME, sCategory.getName()); //String can go in text
         values.put(KEY_CATEGORY_PARENT_ID, sCategory.getParent_id());
         values.put(KEY_CATEGORY_LFT, sCategory.getLft());
         values.put(KEY_CATEGORY_RGT, sCategory.getRgt());
+        values.put(KEY_CATEGORY_LAYER, sCategory.getLayer());
         values.put(KEY_CATEGORY_COLOR, sCategory.getColor()); //Color int can go in Integer
         values.put(KEY_CREATED_AT, getDateTime());
 
         long category_id = db.insert(TABLE_CATEGORY, null, values);
-        db.close();
+        Log.d("CREATED Category", "Category id: "+category_id);
         return category_id;
     }
 
@@ -292,7 +351,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if(c!=null){
             c.moveToFirst();
-            category = new Category(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_CATEGORY_NAME)), c.getLong(c.getColumnIndex(KEY_CATEGORY_PARENT_ID)), c.getLong(c.getColumnIndex(KEY_CATEGORY_LFT)), c.getLong(c.getColumnIndex(KEY_CATEGORY_RGT)), c.getInt(c.getColumnIndex(KEY_CATEGORY_COLOR)));
+            category = new Category(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_CATEGORY_NAME)), c.getLong(c.getColumnIndex(KEY_CATEGORY_PARENT_ID)), c.getLong(c.getColumnIndex(KEY_CATEGORY_LFT)), c.getLong(c.getColumnIndex(KEY_CATEGORY_RGT)), c.getInt(c.getColumnIndex(KEY_CATEGORY_LAYER)), c.getInt(c.getColumnIndex(KEY_CATEGORY_COLOR)));
         }
         db.close();
 
@@ -306,14 +365,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<Category> getAllCategories(){
         Log.d("DatabaseHelper", "getAllCategories Started");
         List<Category> categories = new ArrayList<Category>();
-        String selectQuery = "SELECT * FROM " + TABLE_CATEGORY;
+        String selectQuery = "SELECT * FROM " + TABLE_CATEGORY + " ORDER BY " + KEY_CATEGORY_LFT + " ASC";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
 
         if(c.moveToFirst()){
             do{
-                Category category = new Category(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_CATEGORY_NAME)), c.getLong(c.getColumnIndex(KEY_CATEGORY_PARENT_ID)), c.getLong(c.getColumnIndex(KEY_CATEGORY_LFT)), c.getLong(c.getColumnIndex(KEY_CATEGORY_RGT)), c.getInt(c.getColumnIndex(KEY_CATEGORY_COLOR)));
+                Category category = new Category(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_CATEGORY_NAME)), c.getLong(c.getColumnIndex(KEY_CATEGORY_PARENT_ID)), c.getLong(c.getColumnIndex(KEY_CATEGORY_LFT)), c.getLong(c.getColumnIndex(KEY_CATEGORY_RGT)), c.getInt(c.getColumnIndex(KEY_CATEGORY_LAYER)), c.getInt(c.getColumnIndex(KEY_CATEGORY_COLOR)));
+                categories.add(category);
+            }while(c.moveToNext());
+        }
+        db.close();
+        return categories;
+    }
+
+    /**
+     * Get all events stored in then offline database
+     * @return Array list of Categories
+     */
+    public List<Category> getCategoryTree(Category parent){
+        List<Category> categories = new ArrayList<Category>();
+        String selectQuery = "SELECT * FROM " + TABLE_CATEGORY + " WHERE "+KEY_CATEGORY_LFT+" BETWEEN "+parent.getLft()+" AND "+parent.getRgt();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if(c.moveToFirst()){
+            do{
+                Category category = new Category(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_CATEGORY_NAME)), c.getLong(c.getColumnIndex(KEY_CATEGORY_PARENT_ID)), c.getLong(c.getColumnIndex(KEY_CATEGORY_LFT)), c.getLong(c.getColumnIndex(KEY_CATEGORY_RGT)), c.getInt(c.getColumnIndex(KEY_CATEGORY_LAYER)), c.getInt(c.getColumnIndex(KEY_CATEGORY_COLOR)));
                 categories.add(category);
             }while(c.moveToNext());
         }
@@ -325,6 +405,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * Update Event Id of SmartEvent needs to be equal to Id in Database
      * @param sCategory
      * @return
+     * TODO: check if this is all good
      */
     public int updateCategory(Category sCategory){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -343,12 +424,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Delete Categoty in offline database with the corresponding id
-     * @param category_id Id of category needed to be deleted
+     * Delete Category and all children from database
+     * @param parent parent to be deleted (and all children)
+     *                    TODO: Test delete category and all its children
      */
-    public void deleteCategory(long category_id){
+    public void deleteCategory(Category parent){
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_CATEGORY, KEY_ID + " = ?", new String[] { String.valueOf(category_id)});
+        String deleteQuery = "DELETE FROM "+TABLE_CATEGORY+" WHERE "+KEY_CATEGORY_LFT+" BETWEEN "+parent.getLft()+" AND "+parent.getRgt();
+        db.execSQL(deleteQuery);
         db.close();
     }
 

@@ -10,6 +10,7 @@ public class Category {
     private long parent_id;
     private long lft;
     private long rgt;
+    private int layer = 0;
     private int color;
 
     public Category(long id, String name, long parent_id, long lft, long rgt, int color) {
@@ -18,6 +19,15 @@ public class Category {
         this.parent_id = parent_id;
         this.lft = lft;
         this.rgt = rgt;
+        this.color = color;
+    }
+    public Category(long id, String name, long parent_id, long lft, long rgt, int layer, int color) {
+        this.id = id;
+        this.name = name;
+        this.parent_id = parent_id;
+        this.lft = lft;
+        this.rgt = rgt;
+        this.layer  = layer;
         this.color = color;
     }
 
@@ -59,6 +69,14 @@ public class Category {
 
     public void setRgt(long rgt) {
         this.rgt = rgt;
+    }
+
+    public int getLayer() {
+        return layer;
+    }
+
+    public void setLayer(int layer) {
+        this.layer = layer;
     }
 
     public int getColor() {

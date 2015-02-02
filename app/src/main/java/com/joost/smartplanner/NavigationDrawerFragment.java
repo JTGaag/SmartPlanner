@@ -51,6 +51,7 @@ public class NavigationDrawerFragment extends Fragment {
 
     final String CALENDAR_FRAGMENT_TAG = "calendar_fragment";
     final String CREATE_EVENT_FRAGMENT_TAG = "create_event_fragment";
+    final String CATEGORY_FRAGMENT_TAG = "category_fragment";
 
     //Menu Items
     //DONE: put Strings in string file and not hardcoded (created App(aplication) to access resurces in static method (needed because MenuItems are requested through static method in order to us without this fragment being created))
@@ -123,6 +124,10 @@ public class NavigationDrawerFragment extends Fragment {
 //                                ).addToBackStack(null).commit();
                         mDrawerLayout.closeDrawers();
                         getFragmentManager().beginTransaction().add(R.id.mainFragmentContainer, new CreateEventFragment(), CREATE_EVENT_FRAGMENT_TAG).addToBackStack(null).commit();
+                        break;
+                    case 3:
+                        mDrawerLayout.closeDrawers();
+                        getFragmentManager().beginTransaction().add(R.id.mainFragmentContainer, new CategoryFragment(), CATEGORY_FRAGMENT_TAG).addToBackStack(null).commit();
                         break;
                     default:
 

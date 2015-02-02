@@ -27,6 +27,7 @@ import java.util.List;
  * DONE: port all smartWeekview actions to this fragment (20141228)
  * TODO: Research impact of parsing SmartEvent to WeekViewEvent in order to give to SmartWeekView-->WeekView onMonthChange()
  * TODO: Investigate event draw when scrolling fast
+ * TODO: fix jumping to current time after event created, but overscrolling to beyond 24h
  * DONE: put DatabaseHelper in Activity to be used by all fragments
  */
 public class CalendarFragment extends Fragment implements SmartWeekView.MonthChangeListener, SmartWeekView.EventClickListener, SmartWeekView.EventLongPressListener, SmartWeekView.EmptyClickListener{
