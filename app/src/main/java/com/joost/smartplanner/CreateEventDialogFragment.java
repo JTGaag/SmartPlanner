@@ -145,9 +145,9 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
 
         //set onclicklistners
         //TODO: set date and time to current time, or selected dateTime if so selected
-        //TODO: make it so that startDateTime is always before endDateTime
+        //DONE: make it so that startDateTime is always before endDateTime
         //DONE: fix that after 23:00 sometimes the date is not set correctly (more than 1 hour extra because something wen wrong with the time calculations)
-        //TODO: Set title when it is not set (debug)
+        //DONE: Set title when it is not set (debug)
         startDate.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -167,18 +167,6 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
 
                         //set endDate to the startDate if endDate is not yet set
                         if(!endDateSet){
-                            //Changed to something new (commeted if not working
-
-//                            //Add one hour to set startDateTime
-//                            int hourDif = endDateTime.get(Calendar.HOUR_OF_DAY) - startDateTime.get(Calendar.HOUR_OF_DAY);
-//                            if(hourDif<0){hourDif = hourDif+24;}
-//                            int minuteDif = endDateTime.get(Calendar.MINUTE) - startDateTime.get(Calendar.MINUTE);
-//                            Log.d("Difference","HourDif: "+hourDif+" minuteDif: "+minuteDif);
-//
-//                            endDateTime = (GregorianCalendar)startDateTime.clone();
-//                            endDateTime.add(Calendar.HOUR_OF_DAY, hourDif);
-//                            endDateTime.add(Calendar.MINUTE, minuteDif);
-
                             endDateTime = (GregorianCalendar)startDateTime.clone();
                             endDateTime.add(Calendar.MINUTE, (int)Math.abs(differenceMinute));
 
@@ -261,13 +249,6 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
                         endDateSet = true;
 
                         if(!startDateSet){
-//                            int hourDif = endDateTime.get(Calendar.HOUR_OF_DAY) - startDateTime.get(Calendar.HOUR_OF_DAY);
-//                            if(hourDif<0){hourDif = hourDif+24;}
-//                            int minuteDif = endDateTime.get(Calendar.MINUTE) - startDateTime.get(Calendar.MINUTE);
-//                            startDateTime = (GregorianCalendar) endDateTime.clone();
-//                            startDateTime.add(Calendar.HOUR_OF_DAY, -hourDif);
-//                            startDateTime.add(Calendar.MINUTE, -minuteDif);
-
                             startDateTime = (GregorianCalendar)endDateTime.clone();
                             startDateTime.add(Calendar.MINUTE, -(int)Math.abs(differenceMinute));
 
@@ -361,7 +342,8 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
         getAllCategories();
         //Event name
         String eventName = "(No title)";
-        if(editTextEventName.getText().toString()!=""){
+
+        if(editTextEventName.getText().toString()!=""&&editTextEventName.getText()!=null&&editTextEventName.getText().toString()!=null&&editTextEventName.getText().length()!=0){
             eventName = editTextEventName.getText().toString();
         }
         //Event Color
