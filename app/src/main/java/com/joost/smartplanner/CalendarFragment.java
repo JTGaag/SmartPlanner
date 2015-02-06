@@ -28,6 +28,7 @@ import java.util.List;
  * TODO: Research impact of parsing SmartEvent to WeekViewEvent in order to give to SmartWeekView-->WeekView onMonthChange()
  * TODO: Investigate event draw when scrolling fast
  * TODO: fix jumping to current time after event created, but overscrolling to beyond 24h
+ * TODO: add tempEvents when clicked on calender to add new event (without information exept the time clicked on) these temp evnts need to be deleted after onPause and are not saved in the database. When clicked on these display the create event dialogfragment with the right time
  * DONE: put DatabaseHelper in Activity to be used by all fragments
  */
 public class CalendarFragment extends Fragment implements SmartWeekView.MonthChangeListener, SmartWeekView.EventClickListener, SmartWeekView.EventLongPressListener, SmartWeekView.EmptyClickListener{
@@ -37,13 +38,22 @@ public class CalendarFragment extends Fragment implements SmartWeekView.MonthCha
     private DatabaseHelper db;
     private List<SmartEvent> allSmartEvents = new ArrayList<SmartEvent>();
     private FloatingActionButton fab;
+    private CalendarFragment calendarFragment;
+
+    final String CALENDAR_FRAGMENT_TAG = "calendar_fragment";
+    final String CREATE_EVENT_FRAGMENT_TAG = "create_event_fragment";
+    final String CATEGORY_FRAGMENT_TAG = "category_fragment";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Construct DatabaseHelper
+        //TODO: fix no database error (not the quickfix)
         db = ((MainFragmentActivity)getActivity()).getDatabaseHelper();
-        allSmartEvents = new ArrayList<SmartEvent>(db.getAllEvents());
+        if(db!=null) {
+            allSmartEvents = new ArrayList<SmartEvent>(db.getAllEvents());
+        }
+        calendarFragment = this;
     }
 
     @Override
@@ -74,7 +84,9 @@ public class CalendarFragment extends Fragment implements SmartWeekView.MonthCha
             public void onClick(View view) {
                 FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
                 CreateEventDialogFragment frag = new CreateEventDialogFragment();
-                frag.show(ft, "FRAGMENT_TAG");
+                frag.setSmartWeekView(mSmartWeekView);
+                frag.setCalendarFragment(calendarFragment);
+                frag.show(ft, CREATE_EVENT_FRAGMENT_TAG);
             }
         });
 
@@ -184,5 +196,9 @@ public class CalendarFragment extends Fragment implements SmartWeekView.MonthCha
             }
         }
         return tmpList;
+    }
+
+    public void getAllEvents(){
+        allSmartEvents = db.getAllEvents();
     }
 }

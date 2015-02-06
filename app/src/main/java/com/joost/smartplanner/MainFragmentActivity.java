@@ -24,9 +24,13 @@ import com.joost.database.DatabaseHelper;
 public class MainFragmentActivity extends ActionBarActivity {
 
     FragmentManager fragmentManager;
+    NavigationDrawerFragment drawerFragment;
     private Toolbar toolbar;
     private DatabaseHelper databaseHelper;
+    private OnBackPressedListener mCallBacks;
     final String CALENDAR_FRAGMENT_TAG = "calendar_fragment";
+    final String CREATE_EVENT_FRAGMENT_TAG = "create_event_fragment";
+    final String CATEGORY_FRAGMENT_TAG = "category_fragment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +63,11 @@ public class MainFragmentActivity extends ActionBarActivity {
         //getFragmentManager().beginTransaction().add(R.id.mainFragmentContainer, new CalendarFragment(),CALENDAR_FRAGMENT_TAG).addToBackStack(null).commit();
 
         //Navigation fragment
-        NavigationDrawerFragment drawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
+        drawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout)findViewById(R.id.drawer_layout), toolbar);
 
 
-
+        getFragmentManager().beginTransaction().add(R.id.mainFragmentContainer, new CalendarFragment(), CALENDAR_FRAGMENT_TAG).addToBackStack(null).commit();
 
     }
 
@@ -85,6 +89,10 @@ public class MainFragmentActivity extends ActionBarActivity {
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    public void setOnBackClickListener(OnBackPressedListener onBackClickListener){
+        this.mCallBacks = onBackClickListener;
     }
 
     private void slideCalendar(){

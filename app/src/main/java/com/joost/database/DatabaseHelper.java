@@ -31,7 +31,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String LOG = "DatabaseHelper";
 
     // Database version
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     //Database name
     private static final String DATABASE_NAME = "smartPlannerDatabase";
@@ -50,6 +50,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_EVENT_STARTTIME = "event_start_time";
     private static final String KEY_EVENT_ENDTIME = "event_end_time";
     private static final String KEY_EVENT_COLOR = "event_color";
+    private static final String KEY_EVENT_CATEGORY_ID = "event_category_id";
+
 
     //CATEGORY table names
     //private static final String KEY_EVENT_ID = "event_id";
@@ -65,8 +67,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //Create Tables commands
     private static final String CREATE_TABLE_EVENT = "CREATE TABLE "
-            + TABLE_EVENT + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_EVENT_NAME + " TEXT," + KEY_EVENT_STARTTIME + " INTEGER,"
-            + KEY_EVENT_ENDTIME + " INTEGER," + KEY_EVENT_COLOR + " INTEGER,"+ KEY_CREATED_AT + " DATETIME" + ")";
+            + TABLE_EVENT + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_EVENT_NAME + " TEXT," + KEY_EVENT_CATEGORY_ID + " INTEGER," + KEY_EVENT_STARTTIME + " INTEGER,"
+            + KEY_EVENT_ENDTIME + " INTEGER," + KEY_EVENT_COLOR + " INTEGER," + KEY_CREATED_AT + " DATETIME" + ")";
 
     private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE "
             + TABLE_CATEGORY + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_CATEGORY_NAME + " TEXT," + KEY_CATEGORY_PARENT_ID + " INTEGER,"
@@ -115,6 +117,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(KEY_EVENT_NAME, sEvent.getName()); //String can go in text
+        values.put(KEY_EVENT_CATEGORY_ID, sEvent.getCategoryId());
         values.put(KEY_EVENT_STARTTIME, sEvent.getStartTime().getTimeInMillis()); //Calendar converted to long to go in Integer
         values.put(KEY_EVENT_ENDTIME, sEvent.getEndTime().getTimeInMillis()); //Calendar converted to long to go in Integer
         values.put(KEY_EVENT_COLOR, sEvent.getColor()); //Color int can go in Integer
@@ -122,6 +125,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long event_id = db.insert(TABLE_EVENT, null, values);
         db.close();
+        Log.d("DEBUG","Event created");
         return event_id;
     }
 
@@ -142,7 +146,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Calendar endTime = new GregorianCalendar();
             startTime.setTimeInMillis(c.getLong(c.getColumnIndex(KEY_EVENT_STARTTIME)));
             endTime.setTimeInMillis(c.getLong(c.getColumnIndex(KEY_EVENT_ENDTIME)));
-            smartEvent = new SmartEvent(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_EVENT_NAME)), startTime, endTime,c.getInt(c.getColumnIndex(KEY_EVENT_COLOR)));
+            smartEvent = new SmartEvent(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_EVENT_NAME)), startTime, endTime, c.getInt(c.getColumnIndex(KEY_EVENT_COLOR)), c.getLong(c.getColumnIndex(KEY_EVENT_CATEGORY_ID)));
         }
         db.close();
         return smartEvent;
@@ -167,7 +171,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Calendar endTime = new GregorianCalendar();
                 startTime.setTimeInMillis(c.getLong(c.getColumnIndex(KEY_EVENT_STARTTIME)));
                 endTime.setTimeInMillis(c.getLong(c.getColumnIndex(KEY_EVENT_ENDTIME)));
-                SmartEvent smartEvent = new SmartEvent(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_EVENT_NAME)), startTime, endTime, c.getInt(c.getColumnIndex(KEY_EVENT_COLOR)));
+                SmartEvent smartEvent = new SmartEvent(c.getLong(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(KEY_EVENT_NAME)), startTime, endTime, c.getInt(c.getColumnIndex(KEY_EVENT_COLOR)), c.getLong(c.getColumnIndex(KEY_EVENT_CATEGORY_ID)));
                 Log.d("SmartEvent", smartEvent.toJsonString());
                 events.add(smartEvent);
             }while(c.moveToNext());
@@ -187,6 +191,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(KEY_EVENT_NAME, sEvent.getName()); //String can go in text
+        values.put(KEY_EVENT_CATEGORY_ID, sEvent.getCategoryId());
         values.put(KEY_EVENT_STARTTIME, sEvent.getStartTime().getTimeInMillis()); //Calendar converted to long to go in Integer
         values.put(KEY_EVENT_ENDTIME, sEvent.getEndTime().getTimeInMillis()); //Calendar converted to long to go in Integer
         values.put(KEY_EVENT_COLOR, sEvent.getColor()); //Color int can go in Integer
@@ -433,6 +438,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String deleteQuery = "DELETE FROM "+TABLE_CATEGORY+" WHERE "+KEY_CATEGORY_LFT+" BETWEEN "+parent.getLft()+" AND "+parent.getRgt();
         db.execSQL(deleteQuery);
         db.close();
+
     }
 
 

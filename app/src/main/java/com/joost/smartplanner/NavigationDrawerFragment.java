@@ -123,7 +123,7 @@ public class NavigationDrawerFragment extends Fragment {
 //                                        CREATE_EVENT_FRAGMENT_TAG
 //                                ).addToBackStack(null).commit();
                         mDrawerLayout.closeDrawers();
-                        getFragmentManager().beginTransaction().add(R.id.mainFragmentContainer, new CreateEventFragment(), CREATE_EVENT_FRAGMENT_TAG).addToBackStack(null).commit();
+                        //getFragmentManager().beginTransaction().add(R.id.mainFragmentContainer, new CreateEventFragment(), CREATE_EVENT_FRAGMENT_TAG).addToBackStack(null).commit();
                         break;
                     case 3:
                         mDrawerLayout.closeDrawers();

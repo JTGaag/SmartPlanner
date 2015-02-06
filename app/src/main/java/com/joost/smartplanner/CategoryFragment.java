@@ -85,8 +85,39 @@ public class CategoryFragment extends Fragment {
         });
         categoryListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int index, long l) {
                 //TODO: do something with long click
+                //Update categories to get right thing
+                getAllCategories();
+                final Category clickedCategory = allCategories.get(index);
+
+                //Build confirmation dialog
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
+                alertBuilder.setTitle("Delete Category");
+                alertBuilder.setMessage("Not only the category but also all the sub-categories will be deleted. Do you want to delete \""+clickedCategory.getName()+"\"?");
+                alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //Do nothing
+                    }
+                });
+                alertBuilder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //Delete category and everything else
+                        dbH.deleteCategory(clickedCategory);
+                        //Update correct to refresh the list
+                        getAllCategories();
+                        dbH.rebuildCategoryTree(allCategories.get(0),1);
+                        //Update once more to get the right values for all categories
+                        getAllCategories();
+                        //Update ListView
+                        categoryAdapter.swapData(allCategories);
+                    }
+                });
+                AlertDialog alertDialog = alertBuilder.create();
+                alertDialog.show();
+
                 return false;
             }
         });
@@ -108,6 +139,8 @@ public class CategoryFragment extends Fragment {
                 dbH.rebuildCategoryTree(parent, 1);
                 getAllCategories();
                 displayCategories();
+                //Update ListView
+                categoryAdapter.swapData(allCategories);
             }
         });
 

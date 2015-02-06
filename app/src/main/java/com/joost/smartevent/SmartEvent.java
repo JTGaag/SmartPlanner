@@ -18,7 +18,7 @@ import java.util.Calendar;
 public class SmartEvent extends WeekViewEvent {
 
     private Boolean eventDone = false;
-
+    private long mCategoryId = -1;
 
 
     /**
@@ -69,6 +69,20 @@ public class SmartEvent extends WeekViewEvent {
     }
 
     /**
+     * Initializes the SmartEvent     *
+     * @param id        Id of event
+     * @param name      Name of the event.
+     * @param startTime The time when the event starts.
+     * @param endTime   The time when the event ends.
+     * @param color     The color of the event
+     */
+    public SmartEvent(long id, String name, Calendar startTime, Calendar endTime, int color, long mCategoryId) {
+        super(id, name, startTime, endTime);
+        mColor = color;
+        this.mCategoryId = mCategoryId;
+    }
+
+    /**
      * Create SmartEvent from JSONString
      * @param jsonString String with the information of a previous created SmartEvent object
      */
@@ -92,6 +106,14 @@ public class SmartEvent extends WeekViewEvent {
         this.eventDone = eventDone;
     }
 
+    public long getCategoryId() {
+        return mCategoryId;
+    }
+
+    public void setCategoryId(long categoryId) {
+        this.mCategoryId = categoryId;
+    }
+
     public String toJsonString() {
         JSONObject json = new JSONObject();
         try {
@@ -100,6 +122,7 @@ public class SmartEvent extends WeekViewEvent {
             json.put("startTime", mStartTime.getTimeInMillis());
             json.put("endTime", mEndTime.getTimeInMillis());
             json.put("color", mColor);
+            json.put("categoryId", mCategoryId);
         }catch(JSONException e){
 
         }
