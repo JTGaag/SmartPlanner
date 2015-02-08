@@ -189,7 +189,7 @@ public class WeekView extends View {
                     tappedDay.set(Calendar.MINUTE, tappedMinute);
 
 
-                    //mEmptyClickListener.onEmptyClickCalendar(tappedDay);
+                    mEmptyClickListener.onEmptyClickCalendar(tappedDay);
                 }
 
             }
@@ -237,7 +237,7 @@ public class WeekView extends View {
                     tappedDay.set(Calendar.MINUTE, tappedMinute);
 
 
-                    mEmptyClickListener.onEmptyClickCalendar(tappedDay);
+                    //mEmptyClickListener.onEmptyClickCalendar(tappedDay);
                 }
 
             }

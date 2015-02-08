@@ -47,4 +47,6 @@
     <color name="material_brown">#FF795548</color>
     <color name="material_grey">#FF9E9E9E</color>
     <color name="material_blue_grey">#FF607D8B</color>
+
+    <color name="tmp_event_color">#FFCDDC39</color>
 </resources>

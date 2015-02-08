@@ -36,7 +36,7 @@ import java.util.Locale;
 /**
  * Created by Joost on 27/01/2015.
  */
-public class CreateEventDialogFragment extends DialogFragment implements OnBackPressedListener{
+public class EditEventDialogFragment extends DialogFragment implements OnBackPressedListener{
 
     private Toolbar toolbar;
     private Spinner categorySpinner;
@@ -45,11 +45,7 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
     private TextView endDate;
     private TextView endTime;
     private EditText editTextEventName;
-    //Settings for automatic change end and start values depending on other value
-    private Boolean endTimeSet = false;
-    private Boolean startTimeSet = true;
-    private Boolean endDateSet = false;
-    private Boolean startDateSet = true;
+
     private GregorianCalendar startDateTime = new GregorianCalendar(Locale.getDefault());
     private GregorianCalendar endDateTime = new GregorianCalendar(Locale.getDefault());
     SimpleDateFormat simpleTimeFormat = new SimpleDateFormat("H:mm");
@@ -58,6 +54,11 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
     private List<Category> allCategories;
     private SmartWeekView mSmartWeekView;
     private CalendarFragment mCalendarFragment;
+
+    //If event is tmp event more things need to be done when finished
+    private boolean isTmpEvent = false;
+    private SmartEvent mEditEvent = null;
+    private int selectedCategory = 0;
 
 
 
@@ -68,7 +69,6 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
 
         dbH = ((MainFragmentActivity)getActivity()).getDatabaseHelper();
         getAllCategories();
-        endDateTime.add(Calendar.HOUR_OF_DAY, DEFAULT_EVENT_TIME);
     }
 
     @Override
@@ -85,7 +85,15 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_create_event, container, false);
+        View root = inflater.inflate(R.layout.fragment_edit_event, container, false);
+
+        ///////////////////////
+        //if event is not set dismiss fragment (something went wrong and nothing can be done at this point
+        //////////////////////
+        if(mEditEvent == null){
+            Log.e("Edit event", "ERROR no event is set for the fragment. Please setEditEvent before showing fragment");
+            dismiss();
+        }
 
         ///////////////////////
         //onbackpressedlistener
@@ -95,10 +103,10 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
         ///////////////////////
         //Toolbar
         //////////////////////
-        toolbar = (Toolbar) root.findViewById(R.id.create_event_app_bar);
+        toolbar = (Toolbar) root.findViewById(R.id.edit_event_app_bar);
         toolbar.setNavigationIcon(R.drawable.ic_clear_white_24dp);
-        toolbar.setTitle("New Event");
-        toolbar.inflateMenu(R.menu.menu_create_event);
+        toolbar.setTitle("Edit Event");
+        toolbar.inflateMenu(R.menu.menu_edit_event);
 
         //OnClickListeners
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -114,9 +122,12 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch(menuItem.getItemId()){
                     case R.id.menu_action_save:
-                        createNewEvent();
-                        //Close fragment
-
+                        if(isTmpEvent) {
+                            createNewEvent();
+                        }else {
+                            editEvent();
+                        }
+                        dismiss();
                         break;
                     default:
                         break;
@@ -135,6 +146,22 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
         endTime = (TextView) root.findViewById(R.id.create_event_end_time_tv);
         editTextEventName = (EditText) root.findViewById(R.id.editTextEventName);
 
+        /////////////////////////
+        //Set information from editEvent
+        /////////////////////////
+        getAllCategories();
+        if(!isTmpEvent) {//Only when existing event is edited
+            editTextEventName.setText(mEditEvent.getName());
+        }
+        startDateTime = (GregorianCalendar) mEditEvent.getStartTime().clone();
+        endDateTime = (GregorianCalendar) mEditEvent.getEndTime().clone();
+        for(int i = 0; i<allCategories.size(); i++){
+            if(mEditEvent.getCategoryId() == allCategories.get(i).getId()){
+                selectedCategory = i;
+            }
+        }
+
+
         startDate.setText(startDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(startDateTime.getTime()));
         endDate.setText(endDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(endDateTime.getTime()));
         startTime.setText(simpleTimeFormat.format(startDateTime.getTime()));
@@ -143,6 +170,7 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
         //Set spinners
         CategorySpinnerAdapter categorySpinnerAdapter = new CategorySpinnerAdapter(getActivity(), R.layout.custom_spinner_item, allCategories);
         categorySpinner.setAdapter(categorySpinnerAdapter);
+        categorySpinner.setSelection(selectedCategory);
 
         //set onclicklistners
         //TODO: set date and time to current time, or selected dateTime if so selected
@@ -163,20 +191,6 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
                         startDateTime.set(year, month, day);
 
                         startDate.setText(startDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(startDateTime.getTime()));
-                        //startDate set
-                        startDateSet = true;
-
-                        //set endDate to the startDate if endDate is not yet set
-                        if(!endDateSet){
-                            endDateTime = (GregorianCalendar)startDateTime.clone();
-                            endDateTime.add(Calendar.MINUTE, (int)Math.abs(differenceMinute));
-
-                            Log.d("New dates","start: "+startDateTime.toString());
-                            Log.d("New dates","  end: "+endDateTime.toString());
-                            //Set time and Date fields
-                            endTime.setText(simpleTimeFormat.format(endDateTime.getTime()));
-                            endDate.setText(endDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(endDateTime.getTime()));
-                        }
 
                         //when endTime > startTime
                         if(startDateTime.getTimeInMillis()>endDateTime.getTimeInMillis()){
@@ -206,18 +220,6 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
                         startDateTime.set(Calendar.MINUTE, minute);
 
                         startTime.setText(simpleTimeFormat.format(startDateTime.getTime()));
-                        //startime set
-                        startTimeSet = true;
-                        //Same as date
-                        if(!endTimeSet){
-                            endDateTime.set(Calendar.HOUR_OF_DAY, hour);
-                            endDateTime.add(Calendar.HOUR_OF_DAY, DEFAULT_EVENT_TIME);
-                            endDateTime.set(Calendar.MINUTE, minute);
-
-                            //Set time and Date fields
-                            endTime.setText(simpleTimeFormat.format(endDateTime.getTime()));
-                            endDate.setText(endDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(endDateTime.getTime()));
-                        }
 
                         //when endTime > startTime
                         if(startDateTime.getTimeInMillis()>endDateTime.getTimeInMillis()){
@@ -247,17 +249,6 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
 
                         endDate.setText(endDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(endDateTime.getTime()));
 
-                        endDateSet = true;
-
-                        if(!startDateSet){
-                            startDateTime = (GregorianCalendar)endDateTime.clone();
-                            startDateTime.add(Calendar.MINUTE, -(int)Math.abs(differenceMinute));
-
-                            //Set time and Date fields
-                            startTime.setText(simpleTimeFormat.format(startDateTime.getTime()));
-                            startDate.setText(startDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(startDateTime.getTime()));
-                        }
-
                         //when endTime > startTime
                         if(startDateTime.getTimeInMillis()>endDateTime.getTimeInMillis()){
                             startDateTime = (GregorianCalendar)endDateTime.clone();
@@ -286,17 +277,6 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
                         endDateTime.set(Calendar.MINUTE, minute);
 
                         endTime.setText(simpleTimeFormat.format(endDateTime.getTime()));
-                        endTimeSet = true;
-
-                        if(!startTimeSet){
-                            startDateTime.set(Calendar.HOUR_OF_DAY, hour);
-                            startDateTime.add(Calendar.HOUR_OF_DAY, -DEFAULT_EVENT_TIME);
-                            startDateTime.set(Calendar.MINUTE, minute);
-
-                            //Set time and Date fields
-                            startTime.setText(simpleTimeFormat.format(startDateTime.getTime()));
-                            startDate.setText(startDateTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + ", " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(startDateTime.getTime()));
-                        }
 
                         //when endTime > startTime
                         if(startDateTime.getTimeInMillis()>endDateTime.getTimeInMillis()){
@@ -317,11 +297,12 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
 
 
 
+
     private void cancelDialog(){
         //Confirm dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Discard Event");
-        builder.setMessage("Do you want to discard this event?");
+        builder.setTitle("Discard Changes");
+        builder.setMessage("Do you want to discard all the changes for this event?");
         builder.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -354,11 +335,16 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
         //The new event
         SmartEvent newEvent = new SmartEvent(0, eventName, startDateTime, endDateTime, eventColor, categoryId);
 
-        //Put in dataBase
+        //Cancel for now need to be updated
         dbH.createSmartEvent(newEvent);
 
+        //TODO: Remove tmpEvent from tmp save in calendarFragment
+        if(mCalendarFragment!=null){
+            mCalendarFragment.deleteTmpEvent(mEditEvent.getId());
+        }
+
         //Toast for feedback
-        Toast.makeText(getActivity(),eventName + "Created", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(),eventName + " Created", Toast.LENGTH_SHORT).show();
 
         //Refresh SmartWeekView when it is set
         if(mSmartWeekView!=null && mCalendarFragment!=null){
@@ -366,8 +352,33 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
             mSmartWeekView.notifyDatasetChanged();
             Log.d("DEBUG","View notified");
         }
-        Log.d("Debug", "Dismiss now");
-        dismiss();
+    }
+
+    private void editEvent() {
+        //Refresh categories
+        getAllCategories();
+        //Event name
+        String eventName = "(No title)";
+        if(editTextEventName.getText().toString()!=""&&editTextEventName.getText()!=null&&editTextEventName.getText().toString()!=null&&editTextEventName.getText().length()!=0){
+            eventName = editTextEventName.getText().toString();
+        }
+        mEditEvent.setName(eventName);
+        mEditEvent.setStartTime(startDateTime);
+        mEditEvent.setEndTime(endDateTime);
+        mEditEvent.setColor(allCategories.get(categorySpinner.getSelectedItemPosition()).getColor());
+        mEditEvent.setCategoryId(allCategories.get(categorySpinner.getSelectedItemPosition()).getId());
+
+        dbH.updateEvent(mEditEvent);
+
+        //Toast for feedback
+        Toast.makeText(getActivity(),eventName + " Edited", Toast.LENGTH_SHORT).show();
+
+        //Refresh SmartWeekView when it is set
+        if(mSmartWeekView!=null && mCalendarFragment!=null){
+            mCalendarFragment.getAllEvents();
+            mSmartWeekView.notifyDatasetChanged();
+            Log.d("DEBUG","View notified");
+        }
     }
 
     public SmartWeekView getSmartWeekView() {
@@ -391,4 +402,13 @@ public class CreateEventDialogFragment extends DialogFragment implements OnBackP
     public void onBackPressedCallBack() {
         cancelDialog();
     }
+
+    public void setEditEvent(SmartEvent mEditEvent) {
+        this.mEditEvent = mEditEvent;
+        if(mEditEvent.getId()<0){
+            isTmpEvent = true;
+        }
+    }
 }
+
+

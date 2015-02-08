@@ -106,6 +106,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     ///////////////////////////////////////////////////////////
     //SMARTEVENT methods
     //TODO: create method to save all smartevents in file in order to fill new database on database update
+    //TODO: get all events from a specific category id
     ///////////////////////////////////////////////////////////
     /**
      * Create new entity in offline database from SmartEvent

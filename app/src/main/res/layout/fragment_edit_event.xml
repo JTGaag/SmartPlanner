@@ -16,7 +16,7 @@
 
     <include
         layout="@layout/fullscreen_dialog_app_bar"
-        android:id="@+id/create_event_app_bar"
+        android:id="@+id/edit_event_app_bar"
         />
 
     <ScrollView

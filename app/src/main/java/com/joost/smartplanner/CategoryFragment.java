@@ -86,7 +86,7 @@ public class CategoryFragment extends Fragment {
         categoryListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int index, long l) {
-                //TODO: do something with long click
+                //TODO: When category is deleted also delete it from all the events (set it to -1 for example)
                 //Update categories to get right thing
                 getAllCategories();
                 final Category clickedCategory = allCategories.get(index);

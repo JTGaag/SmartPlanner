@@ -32,6 +32,8 @@ import java.util.List;
  * TODO: Let fragments not overlap: remove previous fragment if a new one needs to be drawn
  * DONE: on click of divider views not in count (make it better)
  * TODO: image as view in recycler view
+ * TODO: Do not redirect to fragment if this one is on top
+ * TODO: Go back to previously created fragment if that is still in existence
  */
 public class NavigationDrawerFragment extends Fragment {
 
